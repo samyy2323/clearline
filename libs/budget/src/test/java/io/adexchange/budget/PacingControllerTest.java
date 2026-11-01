@@ -12,7 +12,7 @@ class PacingControllerTest {
     void compressedDayTracksLinearTargetWithinTolerance() {
         long dayMs = 86_400_000L, budget = 1_000_000;
         ManualClock clock = new ManualClock(0);
-        PacingController pc = new PacingController(clock, 0, dayMs, budget, 1.0, 0.5);
+        PacingController pc = new PacingController(clock, 0, dayMs, budget, 1.0, 0.02);
         double spent = 0, maxErr = 0;
         long demandPerTick = 3 * budget / 1440;
         for (int tick = 0; tick < 1440; tick++) {
@@ -25,11 +25,29 @@ class PacingControllerTest {
         assertThat(spent / budget).isBetween(0.97, 1.0);
     }
 
+    /** The case a cumulative-error PI alone gets wrong: spend accelerates 40x faster than the even-spread rate. */
+    @Test
+    void extremeDemandDoesNotBlowThroughTheCurve() {
+        long dayMs = 86_400_000L, budget = 1_000_000;
+        ManualClock clock = new ManualClock(0);
+        PacingController pc = new PacingController(clock, 0, dayMs, budget, 1.0, 0.02);
+        double spent = 0, maxOver = 0;
+        long demandPerTick = 40 * budget / 1440;
+        for (int tick = 0; tick < 1440; tick++) {
+            clock.advance(60_000);
+            spent = Math.min(budget, spent + demandPerTick * pc.participation());
+            pc.update((long) spent);
+            if (tick > 5) maxOver = Math.max(maxOver, -pc.error());
+        }
+        assertThat(maxOver).as("max overshoot above target, fraction of budget").isLessThan(0.05);
+        assertThat(spent / budget).isBetween(0.95, 1.0);
+    }
+
     @Test
     void doesNotThrottleWhenDemandIsBelowTarget() {
         long dayMs = 86_400_000L, budget = 1_000_000;
         ManualClock clock = new ManualClock(0);
-        PacingController pc = new PacingController(clock, 0, dayMs, budget, 1.0, 0.5);
+        PacingController pc = new PacingController(clock, 0, dayMs, budget, 1.0, 0.02);
         double spent = 0;
         for (int tick = 0; tick < 1440; tick++) {
             clock.advance(60_000);

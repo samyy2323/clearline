@@ -53,9 +53,13 @@ public final class IndexHolder {
     }
 
     public synchronized void replaceAll(Collection<Campaign> cs) {
+        java.util.Set<String> keep = new java.util.HashSet<>();
+        cs.forEach(c -> keep.add(c.id()));
+        java.util.List<String> gone = all.keySet().stream().filter(id -> !keep.contains(id)).toList();
         all.clear();
         cs.forEach(c -> all.put(c.id(), c));
         rebuild();
+        gone.forEach(onRemove);
         cs.forEach(onUpsert);
     }
 

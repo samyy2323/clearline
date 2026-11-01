@@ -49,6 +49,7 @@ public final class LeaseManager {
         final AtomicReference<Local> current = new AtomicReference<>();
         final AtomicReference<Local> next = new AtomicReference<>();
         final ConcurrentLinkedQueue<Local> closed = new ConcurrentLinkedQueue<>();
+        final AtomicLong closedSpent = new AtomicLong();
     }
 
     private final LeaseStore store;
@@ -134,6 +135,7 @@ public final class LeaseManager {
             a.next.set(null);
             a.current.set(n);
             cur.close();
+            a.closedSpent.addAndGet(cur.spent());
             a.closed.add(cur);
         }
         return true;
@@ -152,8 +154,7 @@ public final class LeaseManager {
     public long totalSpent(String campaignId) {
         Account a = accounts.get(campaignId);
         if (a == null) return 0;
-        long s = 0;
-        for (Local l : a.closed) s += l.spent();
+        long s = a.closedSpent.get();
         Local c = a.current.get();
         if (c != null) s += c.spent();
         return s;
@@ -189,6 +190,7 @@ public final class LeaseManager {
         for (Local l : new Local[]{a.current.getAndSet(null), a.next.getAndSet(null)}) {
             if (l != null) {
                 l.close();
+                a.closedSpent.addAndGet(l.spent());
                 a.closed.add(l);
             }
         }

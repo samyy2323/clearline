@@ -1,0 +1,48 @@
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+  tomcat:
+    threads:
+      max: 400
+    accept-count: 2000
+  compression:
+    enabled: true
+
+spring:
+  application:
+    name: adexchange
+  threads:
+    virtual:
+      enabled: ${VIRTUAL_THREADS:true}   # hot-path concurrency model flag, benchmarked in docs/optimization.md
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: adexchange
+
+exchange:
+  pricing: ${PRICING:ab}                    # first | gsp | ab
+  lease-chunk-micros: ${LEASE_CHUNK_MICROS:5000000}
+  lease-ttl-ms: ${LEASE_TTL_MS:60000}
+  redis-uri: ${REDIS_URI:}                  # blank => in-memory (lite mode)
+  hmac-secret: ${HMAC_SECRET:}
+  jwt-secret: ${JWT_SECRET:}
+  admin-password: ${ADMIN_PASSWORD:}
+  advertiser-password: ${ADVERTISER_PASSWORD:}
+  max-in-flight: ${MAX_IN_FLIGHT:4000}
+  ip-rate-limit-per-sec: ${IP_RATE_LIMIT:0}
+  model-path: ${MODEL_PATH:ml/out/weights.json}
+  events-log: ${EVENTS_LOG:data/events.jsonl}
+  seed-demo: ${SEED_DEMO:true}
+  autostart-sim-rate: ${AUTOSTART_SIM_RATE:0}
+  pacing-enabled: ${PACING_ENABLED:true}
