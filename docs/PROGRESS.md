@@ -6,4 +6,6 @@
 - [x] App layer: bid endpoint, campaign CRUD + JWT + outbox, tracker (HMAC, dedupe, fraud), SSE stats, in-process behavior simulator, fault injection
 - [x] Open-loop load generator (HdrHistogram, raw sockets), k6 script, baseline run saved in bench/results
 - [x] Dashboard (React, TanStack Query, ECharts): splash, login, performance, campaigns CRUD, pricing A/B, system health, simulator
-- [ ] Dashboard, ML training, compose/Docker, free deploy, docs, v1.0.0
+- [x] ML: offline trainer with Java/Python hashing parity test, hot reload verified live, convergence saved in bench/results/learning
+- [x] Deploy packaging: Dockerfile, compose (+lite), Prometheus, Grafana, render.yaml, Makefile
+- [ ] Chaos run, profiling + optimizations, README with benchmark table, tag v1.0.0

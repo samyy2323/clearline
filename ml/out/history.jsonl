@@ -1,0 +1,1 @@
+{"trained_at": "2026-11-01T14:35:35Z", "impressions": 28067, "clicks": 565, "logloss": 0.10856936634725367, "logloss_constant_baseline": 0.10410338474099443, "auc": 0.503471736379735, "mean_pred_test": 0.020331075920666505, "ctr_test": 0.021553259707873175}

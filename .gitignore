@@ -7,3 +7,4 @@ dist/
 *.log
 .env
 .tools/
+services/auction-engine/src/main/resources/static/

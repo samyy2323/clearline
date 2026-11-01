@@ -1,0 +1,196 @@
+{
+ "title": "Clearline",
+ "uid": "adx-main",
+ "schemaVersion": 39,
+ "version": 1,
+ "refresh": "5s",
+ "time": {
+  "from": "now-15m",
+  "to": "now"
+ },
+ "panels": [
+  {
+   "id": 1,
+   "type": "timeseries",
+   "title": "Auction latency by stage (p99)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.99, sum by (le, stage) (rate(auction_stage_latency_seconds_bucket[30s])))",
+     "legendFormat": "{{stage}} p99",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "type": "timeseries",
+   "title": "Auction latency by stage (p50)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.5, sum by (le, stage) (rate(auction_stage_latency_seconds_bucket[30s])))",
+     "legendFormat": "{{stage}} p50",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "type": "timeseries",
+   "title": "Requests / bids per second",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ops"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "expr": "rate(auction_requests_total[30s])",
+     "legendFormat": "requests",
+     "refId": "A"
+    },
+    {
+     "expr": "rate(auction_bids_total[30s])",
+     "legendFormat": "bids",
+     "refId": "B"
+    },
+    {
+     "expr": "rate(gateway_shed_total[30s])",
+     "legendFormat": "shed",
+     "refId": "C"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "type": "timeseries",
+   "title": "Overspend % (true local spend above budget)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percent"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "expr": "budget_overspend_pct",
+     "legendFormat": "overspend %",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "type": "timeseries",
+   "title": "Lease: spend denied (fail-closed) and renew failures",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 16,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ops"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "expr": "rate(budget_spend_denied_total[30s])",
+     "legendFormat": "denied/s",
+     "refId": "A"
+    },
+    {
+     "expr": "rate(budget_renew_failures_total[30s])",
+     "legendFormat": "renew failures/s",
+     "refId": "B"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "type": "timeseries",
+   "title": "Frequency cap degraded lookups (fail-open)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 16,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ops"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "expr": "rate(freqcap_degraded_total[30s])",
+     "legendFormat": "degraded/s",
+     "refId": "A"
+    }
+   ]
+  }
+ ]
+}

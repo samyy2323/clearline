@@ -15,6 +15,7 @@ import java.util.Map;
  * <pre>
  *   featureHash = fnv1a32("name=value" low bytes)
  *   index(feature, campaign) = fmix32(featureHash ^ (campaignHash * 0x9E3779B1)) &amp; (2^18 - 1)
+ *   each request feature is used with the campaign hash and with campaign hash 0 (shared across campaigns)
  * </pre>
  */
 public final class PctrModel {
@@ -50,15 +51,24 @@ public final class PctrModel {
         return fmix(featureHash ^ (campaignHash * 0x9E3779B1)) & MASK;
     }
 
-    /** Feature hashes that depend only on the request (computed once per auction). */
+    /**
+     * Feature hashes that depend only on the request (computed once per auction). Each one is used twice at scoring
+     * time: crossed with the campaign (campaign-specific effect) and with campaign hash 0 (shared across campaigns,
+     * which is where most of the signal lives). Includes segment x category and category x hour interactions.
+     */
     public static int[] requestFeatures(String pub, String cat, String dev, String geo, int hour, java.util.List<String> segs) {
-        int[] f = new int[5 + segs.size()];
+        int n = segs.size();
+        int[] f = new int[6 + 2 * n];
         f[0] = fnv1a("pub=" + pub);
         f[1] = fnv1a("cat=" + cat);
         f[2] = fnv1a("dev=" + dev);
         f[3] = fnv1a("geo=" + geo);
         f[4] = fnv1a("hr=" + hour);
-        for (int i = 0; i < segs.size(); i++) f[5 + i] = fnv1a("seg=" + segs.get(i));
+        f[5] = fnv1a("ch=" + cat + "|" + hour);
+        for (int i = 0; i < n; i++) {
+            f[6 + i] = fnv1a("seg=" + segs.get(i));
+            f[6 + n + i] = fnv1a("sc=" + segs.get(i) + "|" + cat);
+        }
         return f;
     }
 
@@ -66,7 +76,7 @@ public final class PctrModel {
     public double predict(int[] reqFeatures, int campaignHash) {
         Weights m = weights;
         double z = m.bias + m.w[index(0, campaignHash)];
-        for (int f : reqFeatures) z += m.w[index(f, campaignHash)];
+        for (int f : reqFeatures) z += m.w[index(f, campaignHash)] + m.w[index(f, 0)];
         return 1.0 / (1.0 + Math.exp(-z));
     }
 

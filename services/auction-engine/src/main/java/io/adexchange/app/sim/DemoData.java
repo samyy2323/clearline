@@ -83,10 +83,22 @@ public final class DemoData {
         return out;
     }
 
-    /** Hidden ground-truth CTR per (segment x category x hour): what the model should learn. */
+    /**
+     * Hidden ground-truth CTR for (segment x category x hour): what the model has to learn. Built from separable audience,
+     * context and time-of-day effects (how real CTR behaves), each a deterministic hash-derived multiplier, so a hashed
+     * logistic regression can recover it from a realistic volume of data.
+     */
     public static double trueCtr(int seg, int cat, int hour) {
-        double base = 0.006 + 0.03 * (((seg * 31 + cat * 17) * 2654435761L >>> 8) % 1000) / 1000.0;
-        double daypart = 1.0 + 0.5 * Math.sin((hour - 14) / 24.0 * 2 * Math.PI); // evening peak
-        return Math.min(0.25, base * daypart);
+        double segMult = 0.35 + 1.9 * unit(seg * 7919L + 13);        // audience interest   0.35x .. 2.25x
+        double catMult = 0.55 + 1.2 * unit(cat * 104729L + 29);      // page context        0.55x .. 1.75x
+        double daypart = 1.0 + 0.45 * Math.sin((hour - 14) / 24.0 * 2 * Math.PI); // evening peak
+        return Math.min(0.30, 0.018 * segMult * catMult * daypart);
+    }
+
+    private static double unit(long x) {
+        x = (x ^ (x >>> 33)) * 0xff51afd7ed558ccdL;
+        x = (x ^ (x >>> 33)) * 0xc4ceb9fe1a85ec53L;
+        x ^= x >>> 33;
+        return (x & 0xFFFFFFL) / (double) 0x1000000L;
     }
 }

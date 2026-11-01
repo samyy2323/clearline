@@ -1,0 +1,46 @@
+# Full local stack: app + Redis (Lua leases, frequency caps) + Prometheus + Grafana.
+# Kafka, ClickHouse and Postgres are NOT part of this build; see docs/adr/0006-lite-mode.md.
+name: adexchange
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, timeout: 3s, retries: 10 }
+
+  app:
+    build: { context: .., dockerfile: Dockerfile }
+    environment:
+      PORT: 8080
+      REDIS_URI: redis://redis:6379
+      AUTOSTART_SIM_RATE: ${AUTOSTART_SIM_RATE:-300}
+      JWT_SECRET: ${JWT_SECRET:-}
+      HMAC_SECRET: ${HMAC_SECRET:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADVERTISER_PASSWORD: ${ADVERTISER_PASSWORD:-}
+      EVENTS_LOG: /app/data/events.jsonl
+      MODEL_PATH: /app/ml/weights.json
+    volumes:
+      - events:/app/data
+      - ../ml/out:/app/ml:ro
+    ports: ["8080:8080"]
+    depends_on: { redis: { condition: service_healthy } }
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["9090:9090"]
+    depends_on: [app]
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["3000:3000"]
+    depends_on: [prometheus]
+
+volumes:
+  events:

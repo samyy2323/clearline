@@ -1,0 +1,16 @@
+# One-click free deploy on Render: connect the repo, it builds the Dockerfile.
+# Free instances sleep when idle and have 512 MB RAM, hence the small heap and the self-driving simulator.
+services:
+  - type: web
+    name: adexchange
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health/liveness
+    envVars:
+      - { key: JAVA_OPTS, value: "-Xms96m -Xmx320m -XX:+UseSerialGC" }
+      - { key: AUTOSTART_SIM_RATE, value: "120" }
+      - { key: EVENTS_LOG, value: "" }
+      - { key: JWT_SECRET, generateValue: true }
+      - { key: HMAC_SECRET, generateValue: true }
+      - { key: ADMIN_PASSWORD, generateValue: true }
+      - { key: ADVERTISER_PASSWORD, generateValue: true }

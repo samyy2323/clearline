@@ -54,7 +54,7 @@ function Login({ onDone }: { onDone: () => void }) {
     <div className="grid min-h-full lg:grid-cols-[1.15fr_1fr]">
       <div className="relative hidden flex-col justify-between border-r border-line p-14 lg:flex"
         style={{ background: 'radial-gradient(1200px 600px at 20% 10%, rgba(201,164,92,0.08), transparent 60%), #0a0b0d' }}>
-        <div className="font-display text-2xl tracking-tight">AdExchange</div>
+        <div className="font-display text-2xl tracking-tight">Clearline</div>
         <div>
           <h1 className="font-display text-6xl leading-[1.02] tracking-tight text-slate-100">
             Every impression,<br />cleared in under<br /><span className="text-accent">fifty milliseconds.</span>
@@ -108,7 +108,7 @@ function Shell({ onLogout }: { onLogout: () => void }) {
   return (
     <div className="min-h-full lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="border-b border-line p-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-b-0 lg:border-r">
-        <div className="font-display text-[26px] tracking-tight">AdExchange</div>
+        <div className="font-display text-[26px] tracking-tight">Clearline</div>
         <div className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-500">Console</div>
         <nav className="mt-6 flex gap-1 overflow-x-auto lg:flex-col">
           <NavLink to="/live" className={link}><Icon d={ICONS.live} />Performance</NavLink>

@@ -28,7 +28,7 @@ export default function Splash({ onSkip }: { onSkip: () => void }) {
   return (
     <div className="splash fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-ink" onClick={onSkip} role="presentation">
       <div className="w-full max-w-xl px-8">
-        <div className="splash-word font-display text-6xl tracking-tight text-slate-100 md:text-7xl">AdExchange</div>
+        <div className="splash-word font-display text-6xl tracking-tight text-slate-100 md:text-7xl">Clearline</div>
         <div className="splash-line mt-5 h-px w-full bg-accent/70" />
         <div className="splash-sub mt-3 flex justify-between text-[11px] uppercase tracking-[0.2em] text-slate-400">
           <span>Real-time auction platform</span>

@@ -1,0 +1,3 @@
+{"trained_at": "2026-11-01T14:40:02Z", "impressions": 46165, "clicks": 1012, "logloss": 0.11002626228872218, "logloss_constant_baseline": 0.10526085995007288, "auc": 0.5638063501843485, "mean_pred_test": 0.021094843941343228, "ctr_test": 0.021878046138849777}
+{"trained_at": "2026-11-01T14:46:22Z", "impressions": 122704, "clicks": 2877, "logloss": 0.11497617272465473, "logloss_constant_baseline": 0.11293039443538155, "auc": 0.5934599379076791, "mean_pred_test": 0.024059189408701984, "ctr_test": 0.02391915569862679}
+{"trained_at": "2026-11-01T14:47:03Z", "impressions": 130624, "clicks": 3081, "logloss": 0.11203596549638604, "logloss_constant_baseline": 0.11451586210636489, "auc": 0.6289961127638979, "mean_pred_test": 0.025219706269309965, "ctr_test": 0.024344497607655502}
