@@ -26,7 +26,8 @@ final class Fixtures {
     AuctionEngine engine;
 
     Fixtures(PricingStrategy strategy) {
-        this(strategy, AuctionEngine.Budgets.defaults());
+        // generous stage budgets: functional tests must not depend on cold-JVM speed; the deadline test passes its own
+        this(strategy, new AuctionEngine.Budgets(5_000_000_000L, 5_000_000_000L, 5_000_000_000L, 5_000_000_000L));
     }
 
     Fixtures(PricingStrategy strategy, AuctionEngine.Budgets budgets) {

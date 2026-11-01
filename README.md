@@ -126,6 +126,20 @@ are in the interview notes.
 - **Synthetic traffic:** the learned model and the pricing comparison describe the simulator, not a real market.
 - **Optimization write-up:** see [docs/optimization.md](docs/optimization.md) for what was and was not measured.
 
+## What was actually verified
+
+- `make test`: 30 tests, green on three consecutive runs: jqwik overspend properties (800 randomized runs), lease and pacing tests,
+  the Redis Lua scripts and frequency cap against a real Redis (Testcontainers), auction ranking, pricing, floors, size matching,
+  deadlines, frequency caps, the Java/Python hashing parity test, and the circuit breaker.
+- The Docker image builds; run under a 512 MB limit with a 320 MB heap it used about 184 MiB, passed its health check, and served the
+  dashboard and deep links.
+- `deploy/compose.yml` (checked on alternate ports): the app ran on Redis leases, Prometheus scraped it, Grafana provisioned the
+  dashboard and its queries returned data.
+- Over real HTTP: signed impression accepted, replayed impression flagged DUPLICATE, tampered token 400, an impression token replayed as
+  a click rejected.
+- **Not verified:** an actual deployment to Render (the config is written but I did not deploy), `make demo` from a fresh clone on a
+  clean machine, and the 10-minute fresh-clone target.
+
 ## Deploy for free
 
 `render.yaml` deploys the single image on Render's free plan (512 MB, sleeps when idle; the simulator drives itself so the dashboard

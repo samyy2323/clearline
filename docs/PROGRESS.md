@@ -8,4 +8,5 @@
 - [x] Dashboard (React, TanStack Query, ECharts): splash, login, performance, campaigns CRUD, pricing A/B, system health, simulator
 - [x] ML: offline trainer with Java/Python hashing parity test, hot reload verified live, convergence saved in bench/results/learning
 - [x] Deploy packaging: Dockerfile, compose (+lite), Prometheus, Grafana, render.yaml, Makefile
-- [ ] Chaos run, profiling + optimizations, README with benchmark table, tag v1.0.0
+- [x] Chaos run (before/after circuit breaker), config experiments, optimization notes, README
+- [ ] Not done: JFR flame graphs, allocation work, Helm/kind, Kafka/ClickHouse/Postgres (see ADR 0006), real Render deployment
