@@ -82,11 +82,11 @@ public class SimulatorService {
     @EventListener(ApplicationReadyEvent.class)
     void onReady() {
         if (props.seedDemo()) {
-            seedCampaigns(preset("steady"), 0);
-            if (props.autostartSimRate() > 0) {
-                Config c = preset("steady");
-                start(new Config("steady", props.autostartSimRate(), c.botFraction(), c.dupFraction(), c.floodFraction(), c.campaigns(), c.seed(), c.budgetScale()));
-            }
+            Config c = preset("steady");
+            Config seeded = new Config("steady", props.autostartSimRate() > 0 ? props.autostartSimRate() : c.rate(), c.botFraction(),
+                    c.dupFraction(), c.floodFraction(), c.campaigns(), c.seed(), props.seedBudgetScale());
+            seedCampaigns(seeded, 0);
+            if (props.autostartSimRate() > 0) start(seeded);
         }
     }
 

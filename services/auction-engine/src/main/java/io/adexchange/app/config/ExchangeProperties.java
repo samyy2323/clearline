@@ -18,6 +18,7 @@ public record ExchangeProperties(
         String modelPath,
         String eventsLog,
         boolean seedDemo,
+        double seedBudgetScale,   // multiplies demo budgets (benchmarks use a large value so budgets don't run dry)
         double autostartSimRate,  // >0: lite mode drives itself with simulated traffic at this rate
         boolean pacingEnabled) {
 
@@ -30,6 +31,7 @@ public record ExchangeProperties(
         if (adminPassword == null || adminPassword.isBlank()) adminPassword = "admin123";
         if (advertiserPassword == null || advertiserPassword.isBlank()) advertiserPassword = "advertiser123";
         if (maxInFlight <= 0) maxInFlight = 4000;
+        if (seedBudgetScale <= 0) seedBudgetScale = 1;
         if (modelPath == null) modelPath = "ml/out/weights.json";
         if (eventsLog == null) eventsLog = "data/events.jsonl";
     }

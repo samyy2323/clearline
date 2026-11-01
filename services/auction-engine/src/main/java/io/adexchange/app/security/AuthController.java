@@ -74,6 +74,9 @@ class AuthController {
             return ResponseEntity.status(401).body(Map.of("error", "invalid credentials"));
         }
         token = jwt.issue(in.username(), role, adv, 8 * 3600);
-        return ResponseEntity.ok(Map.of("token", token, "role", role, "advertiserId", adv == null ? "" : adv, "user", in.username()));
+        String company = adv == null ? "AdExchange Operations"
+                : io.adexchange.app.sim.DemoData.ADVERTISERS[Integer.parseInt(adv.substring(4)) - 1];
+        return ResponseEntity.ok(Map.of("token", token, "role", role, "advertiserId", adv == null ? "" : adv,
+                "user", in.username(), "company", company));
     }
 }

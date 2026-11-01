@@ -4,6 +4,8 @@ server:
   tomcat:
     threads:
       max: 400
+    max-keep-alive-requests: -1
+    keep-alive-timeout: 60s
     accept-count: 2000
   compression:
     enabled: true
@@ -44,5 +46,6 @@ exchange:
   model-path: ${MODEL_PATH:ml/out/weights.json}
   events-log: ${EVENTS_LOG:data/events.jsonl}
   seed-demo: ${SEED_DEMO:true}
+  seed-budget-scale: ${SEED_BUDGET_SCALE:1}
   autostart-sim-rate: ${AUTOSTART_SIM_RATE:0}
   pacing-enabled: ${PACING_ENABLED:true}
