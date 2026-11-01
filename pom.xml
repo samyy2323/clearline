@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.adexchange</groupId>
+  <artifactId>adexchange-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>AdExchange</name>
+
+  <modules>
+    <module>libs/clock</module>
+    <module>libs/budget</module>
+    <module>libs/frequency-cap-lib</module>
+    <module>services/auction-engine</module>
+  </modules>
+
+  <properties>
+    <java.version>21</java.version>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spring-boot.version>3.3.5</spring-boot.version>
+    <jqwik.version>1.9.1</jqwik.version>
+    <junit.version>5.10.5</junit.version>
+    <assertj.version>3.26.3</assertj.version>
+    <lettuce.version>6.4.0.RELEASE</lettuce.version>
+    <testcontainers.version>1.20.3</testcontainers.version>
+    <hdrhistogram.version>2.2.2</hdrhistogram.version>
+    <fastutil.version>8.5.15</fastutil.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency><groupId>io.adexchange</groupId><artifactId>clock</artifactId><version>${project.version}</version></dependency>
+      <dependency><groupId>io.adexchange</groupId><artifactId>budget</artifactId><version>${project.version}</version></dependency>
+      <dependency><groupId>io.adexchange</groupId><artifactId>frequency-cap-lib</artifactId><version>${project.version}</version></dependency>
+      <dependency><groupId>io.lettuce</groupId><artifactId>lettuce-core</artifactId><version>${lettuce.version}</version></dependency>
+      <dependency><groupId>net.jqwik</groupId><artifactId>jqwik</artifactId><version>${jqwik.version}</version></dependency>
+      <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><version>${assertj.version}</version></dependency>
+      <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${testcontainers.version}</version></dependency>
+      <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><version>${testcontainers.version}</version></dependency>
+      <dependency><groupId>org.hdrhistogram</groupId><artifactId>HdrHistogram</artifactId><version>${hdrhistogram.version}</version></dependency>
+      <dependency><groupId>it.unimi.dsi</groupId><artifactId>fastutil</artifactId><version>${fastutil.version}</version></dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <!-- every module gets the test stack -->
+  <dependencies>
+    <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><scope>test</scope></dependency>
+    <dependency><groupId>net.jqwik</groupId><artifactId>jqwik</artifactId><scope>test</scope></dependency>
+    <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><scope>test</scope></dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.2.5</version>
+          <configuration>
+            <!-- Docker Engine 29 rejects the docker-java default API version used by Testcontainers 1.20 -->
+            <argLine>-Dapi.version=1.44</argLine>
+            <includes>
+              <include>**/*Test.java</include>
+              <include>**/*Properties.java</include>
+              <include>**/*IT.java</include>
+            </includes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
