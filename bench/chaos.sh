@@ -14,7 +14,7 @@ for _ in $(seq 1 60); do curl -sf "$APP_URL/actuator/health" >/dev/null 2>&1 && 
 TOKEN=$(curl -s -X POST "$APP_URL/api/auth/login" -H 'content-type: application/json' -d "{\"username\":\"admin\",\"password\":\"${ADMIN_PASSWORD:-admin123}\"}" | python -c "import sys,json;print(json.load(sys.stdin)['token'])")
 fault() { curl -s -X POST "$APP_URL/api/sim/faults" -H "Authorization: Bearer $TOKEN" -H 'content-type: application/json' -d "$1" > /dev/null; echo "t=$(date +%T) fault $1" | tee -a "$OUT/events.log"; }
 ( sleep 45; fault '{"redisDown":true}'; sleep 30; fault '{"redisDown":false}'; sleep 30; fault '{"latencyMs":200}'; sleep 30; fault '{"latencyMs":0}' ) &
-java -jar simulator/target/simulator-1.0.0-SNAPSHOT.jar --url "$APP_URL" --scenario steady --rate "$RATE" --duration 150 --warmup 15 --label chaos --out "$OUT/loadgen.json" | tee "$OUT/loadgen.log" >/dev/null
+java -jar simulator/target/simulator-1.0.0-SNAPSHOT.jar --url "$APP_URL" --scenario steady --rate "$RATE" --duration 150 --warmup 15 --connections ${CONNECTIONS:-1024} --label chaos --out "$OUT/loadgen.json" | tee "$OUT/loadgen.log" >/dev/null
 curl -s -H "Authorization: Bearer $TOKEN" "$APP_URL/api/timeseries" > "$OUT/timeseries.json"
 curl -s "$APP_URL/actuator/prometheus" > "$OUT/prometheus.txt"
 python bench/plot_chaos.py "$OUT" || echo "plot skipped (matplotlib missing?)"

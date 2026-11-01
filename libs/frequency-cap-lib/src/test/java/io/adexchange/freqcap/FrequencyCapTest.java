@@ -28,6 +28,27 @@ class FrequencyCapTest {
     }
 
     @Test
+    void slowStoreOpensTheBreakerSoAuctionsStopPayingForIt() {
+        FrequencyCapStore slow = new FrequencyCapStore() {
+            public boolean check(String u, String[] i, int[] c, int n, boolean[] o, long t) {
+                try { Thread.sleep(30); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+                return true;
+            }
+            public void record(String u, String c, long t) {}
+        };
+        try (var r = new ResilientFrequencyCap(slow, 4, java.time.Duration.ofMillis(10), java.time.Duration.ofSeconds(30))) {
+            boolean[] out = new boolean[1];
+            for (int i = 0; i < 12; i++) r.check("u", new String[]{"a"}, new int[]{1}, 1, out, 0);
+            assertThat(r.breakerState()).isEqualTo("OPEN");
+            long t0 = System.nanoTime();
+            boolean ok = r.check("u", new String[]{"a"}, new int[]{1}, 1, out, 0);
+            assertThat(ok).as("skipped, flagged degraded").isFalse();
+            assertThat((System.nanoTime() - t0) / 1_000_000).as("returns immediately").isLessThan(5);
+            assertThat(r.breakerRejected.get()).isPositive();
+        }
+    }
+
+    @Test
     void failsOpenAndFlagsDegradedWhenStoreThrows() {
         FrequencyCapStore broken = new FrequencyCapStore() {
             public boolean check(String u, String[] i, int[] c, int n, boolean[] o, long t) { throw new IllegalStateException(); }

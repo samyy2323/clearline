@@ -1,0 +1,552 @@
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests
+# TYPE application_ready_time_seconds gauge
+application_ready_time_seconds{application="adexchange",main_application_class="io.adexchange.app.AdExchangeApplication"} 3.227
+# HELP application_started_time_seconds Time taken to start the application
+# TYPE application_started_time_seconds gauge
+application_started_time_seconds{application="adexchange",main_application_class="io.adexchange.app.AdExchangeApplication"} 3.075
+# HELP auction_bids_total  
+# TYPE auction_bids_total counter
+auction_bids_total{application="adexchange"} 194568.0
+# HELP auction_requests_total  
+# TYPE auction_requests_total counter
+auction_requests_total{application="adexchange"} 495000.0
+# HELP auction_stage_latency_seconds  
+# TYPE auction_stage_latency_seconds histogram
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.001"} 494000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.001048576"} 494010
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.001398101"} 494042
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.001747626"} 494063
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.002097151"} 494082
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.002446676"} 494100
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.002796201"} 494111
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.003145726"} 494125
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.003495251"} 494136
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.003844776"} 494145
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.004194304"} 494156
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.005592405"} 494180
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.006990506"} 494192
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.008388607"} 494197
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.009786708"} 494201
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.011184809"} 494203
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.01258291"} 494205
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.013981011"} 494207
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.015379112"} 494216
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.016777216"} 494218
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.022369621"} 494232
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.027962026"} 494239
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.033554431"} 494249
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.039146836"} 494257
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.044739241"} 494267
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.050331646"} 494279
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.055924051"} 494286
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.061516456"} 494289
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.067108864"} 494293
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.089478485"} 494296
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.111848106"} 494300
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.134217727"} 494302
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.156587348"} 494304
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.178956969"} 494305
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.20132659"} 494314
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.223696211"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.246065832"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.268435456"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.357913941"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.447392426"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.536870911"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.626349396"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.715827881"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.805306366"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.894784851"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="0.984263336"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="1.073741824"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="1.431655765"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="1.789569706"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="2.147483647"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="2.505397588"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="2.863311529"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="3.22122547"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="3.579139411"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="3.937053352"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="4.294967296"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="5.726623061"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="7.158278826"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="8.589934591"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="10.021590356"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="11.453246121"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="12.884901886"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="14.316557651"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="15.748213416"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="17.179869184"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="22.906492245"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="28.633115306"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="30.0"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="budget",le="+Inf"} 495000
+auction_stage_latency_seconds_count{application="adexchange",stage="budget"} 495000
+auction_stage_latency_seconds_sum{application="adexchange",stage="budget"} 154.0405545
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.001"} 494987
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.001048576"} 494987
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.001398101"} 494988
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.001747626"} 494988
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.002097151"} 494992
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.002446676"} 494992
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.002796201"} 494993
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.003145726"} 494995
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.003495251"} 494995
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.003844776"} 494996
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.004194304"} 494997
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.005592405"} 494999
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.006990506"} 494999
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.008388607"} 494999
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.009786708"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.011184809"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.01258291"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.013981011"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.015379112"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.016777216"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.022369621"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.027962026"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.033554431"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.039146836"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.044739241"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.050331646"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.055924051"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.061516456"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.067108864"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.089478485"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.111848106"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.134217727"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.156587348"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.178956969"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.20132659"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.223696211"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.246065832"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.268435456"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.357913941"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.447392426"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.536870911"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.626349396"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.715827881"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.805306366"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.894784851"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="0.984263336"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="1.073741824"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="1.431655765"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="1.789569706"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="2.147483647"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="2.505397588"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="2.863311529"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="3.22122547"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="3.579139411"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="3.937053352"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="4.294967296"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="5.726623061"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="7.158278826"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="8.589934591"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="10.021590356"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="11.453246121"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="12.884901886"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="14.316557651"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="15.748213416"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="17.179869184"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="22.906492245"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="28.633115306"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="30.0"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="retrieval",le="+Inf"} 495000
+auction_stage_latency_seconds_count{application="adexchange",stage="retrieval"} 495000
+auction_stage_latency_seconds_sum{application="adexchange",stage="retrieval"} 0.7577732
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.001"} 494941
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.001048576"} 494941
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.001398101"} 494956
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.001747626"} 494963
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.002097151"} 494967
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.002446676"} 494972
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.002796201"} 494975
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.003145726"} 494981
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.003495251"} 494985
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.003844776"} 494990
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.004194304"} 494992
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.005592405"} 494999
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.006990506"} 494999
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.008388607"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.009786708"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.011184809"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.01258291"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.013981011"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.015379112"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.016777216"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.022369621"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.027962026"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.033554431"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.039146836"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.044739241"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.050331646"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.055924051"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.061516456"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.067108864"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.089478485"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.111848106"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.134217727"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.156587348"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.178956969"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.20132659"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.223696211"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.246065832"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.268435456"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.357913941"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.447392426"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.536870911"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.626349396"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.715827881"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.805306366"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.894784851"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="0.984263336"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="1.073741824"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="1.431655765"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="1.789569706"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="2.147483647"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="2.505397588"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="2.863311529"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="3.22122547"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="3.579139411"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="3.937053352"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="4.294967296"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="5.726623061"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="7.158278826"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="8.589934591"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="10.021590356"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="11.453246121"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="12.884901886"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="14.316557651"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="15.748213416"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="17.179869184"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="22.906492245"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="28.633115306"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="30.0"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="scoring",le="+Inf"} 495000
+auction_stage_latency_seconds_count{application="adexchange",stage="scoring"} 495000
+auction_stage_latency_seconds_sum{application="adexchange",stage="scoring"} 3.1136926
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.001"} 493922
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.001048576"} 493928
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.001398101"} 493972
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.001747626"} 494002
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.002097151"} 494036
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.002446676"} 494061
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.002796201"} 494074
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.003145726"} 494095
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.003495251"} 494112
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.003844776"} 494126
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.004194304"} 494144
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.005592405"} 494176
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.006990506"} 494188
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.008388607"} 494196
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.009786708"} 494201
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.011184809"} 494203
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.01258291"} 494205
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.013981011"} 494207
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.015379112"} 494216
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.016777216"} 494218
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.022369621"} 494232
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.027962026"} 494239
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.033554431"} 494249
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.039146836"} 494257
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.044739241"} 494266
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.050331646"} 494279
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.055924051"} 494286
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.061516456"} 494289
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.067108864"} 494293
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.089478485"} 494296
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.111848106"} 494300
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.134217727"} 494302
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.156587348"} 494304
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.178956969"} 494305
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.20132659"} 494314
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.223696211"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.246065832"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.268435456"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.357913941"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.447392426"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.536870911"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.626349396"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.715827881"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.805306366"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.894784851"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="0.984263336"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="1.073741824"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="1.431655765"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="1.789569706"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="2.147483647"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="2.505397588"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="2.863311529"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="3.22122547"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="3.579139411"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="3.937053352"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="4.294967296"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="5.726623061"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="7.158278826"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="8.589934591"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="10.021590356"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="11.453246121"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="12.884901886"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="14.316557651"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="15.748213416"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="17.179869184"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="22.906492245"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="28.633115306"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="30.0"} 495000
+auction_stage_latency_seconds_bucket{application="adexchange",stage="total",le="+Inf"} 495000
+auction_stage_latency_seconds_count{application="adexchange",stage="total"} 495000
+auction_stage_latency_seconds_sum{application="adexchange",stage="total"} 157.9120203
+# HELP auction_stage_latency_seconds_max  
+# TYPE auction_stage_latency_seconds_max gauge
+auction_stage_latency_seconds_max{application="adexchange",stage="budget"} 0.2163816
+auction_stage_latency_seconds_max{application="adexchange",stage="retrieval"} 0.0084748
+auction_stage_latency_seconds_max{application="adexchange",stage="scoring"} 0.0078133
+auction_stage_latency_seconds_max{application="adexchange",stage="total"} 0.2163914
+# HELP billing_total_micros  
+# TYPE billing_total_micros gauge
+billing_total_micros{application="adexchange"} 0.0
+# HELP budget_overspend_pct  
+# TYPE budget_overspend_pct gauge
+budget_overspend_pct{application="adexchange"} 0.0
+# HELP budget_renew_failures_total  
+# TYPE budget_renew_failures_total counter
+budget_renew_failures_total{application="adexchange"} 2360.0
+# HELP budget_spend_denied_total  
+# TYPE budget_spend_denied_total counter
+budget_spend_denied_total{application="adexchange"} 4341192.0
+# HELP disk_free_bytes Usable space for path
+# TYPE disk_free_bytes gauge
+disk_free_bytes{application="adexchange",path="C:\\Ad-Exchange\\."} 6.5135034368E11
+# HELP disk_total_bytes Total space for path
+# TYPE disk_total_bytes gauge
+disk_total_bytes{application="adexchange",path="C:\\Ad-Exchange\\."} 1.022728597504E12
+# HELP freqcap_degraded_total  
+# TYPE freqcap_degraded_total counter
+freqcap_degraded_total{application="adexchange"} 188316.0
+# HELP gateway_inflight  
+# TYPE gateway_inflight gauge
+gateway_inflight{application="adexchange"} 0.0
+# HELP gateway_shed_total  
+# TYPE gateway_shed_total counter
+gateway_shed_total{application="adexchange"} 0.0
+# HELP http_server_requests_active_seconds  
+# TYPE http_server_requests_active_seconds summary
+http_server_requests_active_seconds_count{application="adexchange",exception="none",method="GET",outcome="SUCCESS",status="200",uri="UNKNOWN"} 2
+http_server_requests_active_seconds_sum{application="adexchange",exception="none",method="GET",outcome="SUCCESS",status="200",uri="UNKNOWN"} 170.6831308
+http_server_requests_active_seconds_count{application="adexchange",exception="none",method="POST",outcome="SUCCESS",status="200",uri="UNKNOWN"} 0
+http_server_requests_active_seconds_sum{application="adexchange",exception="none",method="POST",outcome="SUCCESS",status="200",uri="UNKNOWN"} 0.0
+# HELP http_server_requests_active_seconds_max  
+# TYPE http_server_requests_active_seconds_max gauge
+http_server_requests_active_seconds_max{application="adexchange",exception="none",method="GET",outcome="SUCCESS",status="200",uri="UNKNOWN"} 170.2038756
+http_server_requests_active_seconds_max{application="adexchange",exception="none",method="POST",outcome="SUCCESS",status="200",uri="UNKNOWN"} 0.0
+# HELP http_server_requests_seconds  
+# TYPE http_server_requests_seconds summary
+http_server_requests_seconds_count{application="adexchange",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/actuator/health"} 1
+http_server_requests_seconds_sum{application="adexchange",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/actuator/health"} 0.1691108
+http_server_requests_seconds_count{application="adexchange",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/api/timeseries"} 1
+http_server_requests_seconds_sum{application="adexchange",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/api/timeseries"} 0.0179429
+http_server_requests_seconds_count{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/api/auth/login"} 1
+http_server_requests_seconds_sum{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/api/auth/login"} 0.1284548
+http_server_requests_seconds_count{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/api/sim/faults"} 4
+http_server_requests_seconds_sum{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/api/sim/faults"} 0.009885
+http_server_requests_seconds_count{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/openrtb/bid"} 194568
+http_server_requests_seconds_sum{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/openrtb/bid"} 59.2311606
+http_server_requests_seconds_count{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="204",uri="/openrtb/bid"} 300432
+http_server_requests_seconds_sum{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="204",uri="/openrtb/bid"} 176.8234661
+# HELP http_server_requests_seconds_max  
+# TYPE http_server_requests_seconds_max gauge
+http_server_requests_seconds_max{application="adexchange",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/actuator/health"} 0.1691108
+http_server_requests_seconds_max{application="adexchange",error="none",exception="none",method="GET",outcome="SUCCESS",status="200",uri="/api/timeseries"} 0.0179429
+http_server_requests_seconds_max{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/api/auth/login"} 0.1284548
+http_server_requests_seconds_max{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/api/sim/faults"} 0.0076917
+http_server_requests_seconds_max{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="200",uri="/openrtb/bid"} 0.3519265
+http_server_requests_seconds_max{application="adexchange",error="none",exception="none",method="POST",outcome="SUCCESS",status="204",uri="/openrtb/bid"} 0.3118432
+# HELP jvm_info JVM version info
+# TYPE jvm_info gauge
+jvm_info{application="adexchange",runtime="OpenJDK Runtime Environment",vendor="Eclipse Adoptium",version="21.0.12.1+1-LTS"} 1
+# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool
+# TYPE jvm_buffer_count_buffers gauge
+jvm_buffer_count_buffers{application="adexchange",id="direct"} 13.0
+jvm_buffer_count_buffers{application="adexchange",id="mapped"} 0.0
+jvm_buffer_count_buffers{application="adexchange",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool
+# TYPE jvm_buffer_memory_used_bytes gauge
+jvm_buffer_memory_used_bytes{application="adexchange",id="direct"} 206576.0
+jvm_buffer_memory_used_bytes{application="adexchange",id="mapped"} 0.0
+jvm_buffer_memory_used_bytes{application="adexchange",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool
+# TYPE jvm_buffer_total_capacity_bytes gauge
+jvm_buffer_total_capacity_bytes{application="adexchange",id="direct"} 206576.0
+jvm_buffer_total_capacity_bytes{application="adexchange",id="mapped"} 0.0
+jvm_buffer_total_capacity_bytes{application="adexchange",id="mapped - 'non-volatile memory'"} 0.0
+# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine
+# TYPE jvm_classes_loaded_classes gauge
+jvm_classes_loaded_classes{application="adexchange"} 10636.0
+# HELP jvm_classes_unloaded_classes_total The total number of classes unloaded since the Java virtual machine has started execution
+# TYPE jvm_classes_unloaded_classes_total counter
+jvm_classes_unloaded_classes_total{application="adexchange"} 0.0
+# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation
+# TYPE jvm_compilation_time_ms_total counter
+jvm_compilation_time_ms_total{application="adexchange",compiler="HotSpot 64-Bit Tiered Compilers"} 42572.0
+# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation
+# TYPE jvm_gc_live_data_size_bytes gauge
+jvm_gc_live_data_size_bytes{application="adexchange"} 0.0
+# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool
+# TYPE jvm_gc_max_data_size_bytes gauge
+jvm_gc_max_data_size_bytes{application="adexchange"} 1.073741824E9
+# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next
+# TYPE jvm_gc_memory_allocated_bytes_total counter
+jvm_gc_memory_allocated_bytes_total{application="adexchange"} 2.2185771008E10
+# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC
+# TYPE jvm_gc_memory_promoted_bytes_total counter
+jvm_gc_memory_promoted_bytes_total{application="adexchange"} 7.6686016E7
+# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]
+# TYPE jvm_gc_overhead gauge
+jvm_gc_overhead{application="adexchange"} 0.0012482163054613805
+# HELP jvm_gc_pause_seconds Time spent in GC pause
+# TYPE jvm_gc_pause_seconds summary
+jvm_gc_pause_seconds_count{action="end of minor GC",application="adexchange",cause="G1 Evacuation Pause",gc="G1 Young Generation"} 37
+jvm_gc_pause_seconds_sum{action="end of minor GC",application="adexchange",cause="G1 Evacuation Pause",gc="G1 Young Generation"} 0.214
+# HELP jvm_gc_pause_seconds_max Time spent in GC pause
+# TYPE jvm_gc_pause_seconds_max gauge
+jvm_gc_pause_seconds_max{action="end of minor GC",application="adexchange",cause="G1 Evacuation Pause",gc="G1 Young Generation"} 0.018
+# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use
+# TYPE jvm_memory_committed_bytes gauge
+jvm_memory_committed_bytes{application="adexchange",area="heap",id="G1 Eden Space"} 6.52214272E8
+jvm_memory_committed_bytes{application="adexchange",area="heap",id="G1 Old Gen"} 3.97410304E8
+jvm_memory_committed_bytes{application="adexchange",area="heap",id="G1 Survivor Space"} 2.4117248E7
+jvm_memory_committed_bytes{application="adexchange",area="nonheap",id="CodeHeap 'non-nmethods'"} 2555904.0
+jvm_memory_committed_bytes{application="adexchange",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 1.2189696E7
+jvm_memory_committed_bytes{application="adexchange",area="nonheap",id="CodeHeap 'profiled nmethods'"} 2.2216704E7
+jvm_memory_committed_bytes{application="adexchange",area="nonheap",id="Compressed Class Space"} 6815744.0
+jvm_memory_committed_bytes{application="adexchange",area="nonheap",id="Metaspace"} 5.0724864E7
+# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management
+# TYPE jvm_memory_max_bytes gauge
+jvm_memory_max_bytes{application="adexchange",area="heap",id="G1 Eden Space"} -1.0
+jvm_memory_max_bytes{application="adexchange",area="heap",id="G1 Old Gen"} 1.073741824E9
+jvm_memory_max_bytes{application="adexchange",area="heap",id="G1 Survivor Space"} -1.0
+jvm_memory_max_bytes{application="adexchange",area="nonheap",id="CodeHeap 'non-nmethods'"} 5898240.0
+jvm_memory_max_bytes{application="adexchange",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 1.2288E8
+jvm_memory_max_bytes{application="adexchange",area="nonheap",id="CodeHeap 'profiled nmethods'"} 1.2288E8
+jvm_memory_max_bytes{application="adexchange",area="nonheap",id="Compressed Class Space"} 1.073741824E9
+jvm_memory_max_bytes{application="adexchange",area="nonheap",id="Metaspace"} -1.0
+# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]
+# TYPE jvm_memory_usage_after_gc gauge
+jvm_memory_usage_after_gc{application="adexchange",area="heap",pool="long-lived"} 0.07630223035812378
+# HELP jvm_memory_used_bytes The amount of used memory
+# TYPE jvm_memory_used_bytes gauge
+jvm_memory_used_bytes{application="adexchange",area="heap",id="G1 Eden Space"} 3.85875968E8
+jvm_memory_used_bytes{application="adexchange",area="heap",id="G1 Old Gen"} 8.1928896E7
+jvm_memory_used_bytes{application="adexchange",area="heap",id="G1 Survivor Space"} 2.3899776E7
+jvm_memory_used_bytes{application="adexchange",area="nonheap",id="CodeHeap 'non-nmethods'"} 1550464.0
+jvm_memory_used_bytes{application="adexchange",area="nonheap",id="CodeHeap 'non-profiled nmethods'"} 1.2145152E7
+jvm_memory_used_bytes{application="adexchange",area="nonheap",id="CodeHeap 'profiled nmethods'"} 2.2183424E7
+jvm_memory_used_bytes{application="adexchange",area="nonheap",id="Compressed Class Space"} 6361304.0
+jvm_memory_used_bytes{application="adexchange",area="nonheap",id="Metaspace"} 4.974296E7
+# HELP jvm_threads_daemon_threads The current number of live daemon threads
+# TYPE jvm_threads_daemon_threads gauge
+jvm_threads_daemon_threads{application="adexchange"} 23.0
+# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads
+# TYPE jvm_threads_live_threads gauge
+jvm_threads_live_threads{application="adexchange"} 27.0
+# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset
+# TYPE jvm_threads_peak_threads gauge
+jvm_threads_peak_threads{application="adexchange"} 27.0
+# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM
+# TYPE jvm_threads_started_threads_total counter
+jvm_threads_started_threads_total{application="adexchange"} 30.0
+# HELP jvm_threads_states_threads The current number of threads
+# TYPE jvm_threads_states_threads gauge
+jvm_threads_states_threads{application="adexchange",state="blocked"} 0.0
+jvm_threads_states_threads{application="adexchange",state="new"} 0.0
+jvm_threads_states_threads{application="adexchange",state="runnable"} 7.0
+jvm_threads_states_threads{application="adexchange",state="terminated"} 0.0
+jvm_threads_states_threads{application="adexchange",state="timed-waiting"} 6.0
+jvm_threads_states_threads{application="adexchange",state="waiting"} 14.0
+# HELP logback_events_total Number of log events that were enabled by the effective log level
+# TYPE logback_events_total counter
+logback_events_total{application="adexchange",level="debug"} 0.0
+logback_events_total{application="adexchange",level="error"} 0.0
+logback_events_total{application="adexchange",level="info"} 5.0
+logback_events_total{application="adexchange",level="trace"} 0.0
+logback_events_total{application="adexchange",level="warn"} 0.0
+# HELP process_cpu_time_ns_total The "cpu time" used by the Java Virtual Machine process
+# TYPE process_cpu_time_ns_total counter
+process_cpu_time_ns_total{application="adexchange"} 1.856875E11
+# HELP process_cpu_usage The "recent cpu usage" for the Java Virtual Machine process
+# TYPE process_cpu_usage gauge
+process_cpu_usage{application="adexchange"} 0.106853607480368
+# HELP process_start_time_seconds Start time of the process since unix epoch.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds{application="adexchange"} 1.793544934866E9
+# HELP process_uptime_seconds The uptime of the Java virtual machine
+# TYPE process_uptime_seconds gauge
+process_uptime_seconds{application="adexchange"} 174.811
+# HELP system_cpu_count The number of processors available to the Java virtual machine
+# TYPE system_cpu_count gauge
+system_cpu_count{application="adexchange"} 12.0
+# HELP system_cpu_usage The "recent cpu usage" of the system the application is running in
+# TYPE system_cpu_usage gauge
+system_cpu_usage{application="adexchange"} 0.0
+# HELP tasks_scheduled_execution_active_seconds  
+# TYPE tasks_scheduled_execution_active_seconds summary
+tasks_scheduled_execution_active_seconds_count{application="adexchange",code_function="learningBin",code_namespace="io.adexchange.app.sim.SimulatorService",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="adexchange",code_function="learningBin",code_namespace="io.adexchange.app.sim.SimulatorService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_count{application="adexchange",code_function="pollModel",code_namespace="io.adexchange.app.stats.StatsController",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="adexchange",code_function="pollModel",code_namespace="io.adexchange.app.stats.StatsController",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_count{application="adexchange",code_function="relay",code_namespace="io.adexchange.app.campaign.CampaignService",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="adexchange",code_function="relay",code_namespace="io.adexchange.app.campaign.CampaignService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_count{application="adexchange",code_function="reportNothing",code_namespace="io.adexchange.app.sim.SimulatorService",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="adexchange",code_function="reportNothing",code_namespace="io.adexchange.app.sim.SimulatorService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_count{application="adexchange",code_function="sample",code_namespace="io.adexchange.app.stats.StatsService",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="adexchange",code_function="sample",code_namespace="io.adexchange.app.stats.StatsService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_count{application="adexchange",code_function="tick",code_namespace="io.adexchange.app.config.PacingRegistry",exception="none",outcome="UNKNOWN"} 0
+tasks_scheduled_execution_active_seconds_sum{application="adexchange",code_function="tick",code_namespace="io.adexchange.app.config.PacingRegistry",exception="none",outcome="UNKNOWN"} 0.0
+# HELP tasks_scheduled_execution_active_seconds_max  
+# TYPE tasks_scheduled_execution_active_seconds_max gauge
+tasks_scheduled_execution_active_seconds_max{application="adexchange",code_function="learningBin",code_namespace="io.adexchange.app.sim.SimulatorService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_max{application="adexchange",code_function="pollModel",code_namespace="io.adexchange.app.stats.StatsController",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_max{application="adexchange",code_function="relay",code_namespace="io.adexchange.app.campaign.CampaignService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_max{application="adexchange",code_function="reportNothing",code_namespace="io.adexchange.app.sim.SimulatorService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_max{application="adexchange",code_function="sample",code_namespace="io.adexchange.app.stats.StatsService",exception="none",outcome="UNKNOWN"} 0.0
+tasks_scheduled_execution_active_seconds_max{application="adexchange",code_function="tick",code_namespace="io.adexchange.app.config.PacingRegistry",exception="none",outcome="UNKNOWN"} 0.0
+# HELP tasks_scheduled_execution_seconds  
+# TYPE tasks_scheduled_execution_seconds summary
+tasks_scheduled_execution_seconds_count{application="adexchange",code_function="learningBin",code_namespace="io.adexchange.app.sim.SimulatorService",error="none",exception="none",outcome="SUCCESS"} 35
+tasks_scheduled_execution_seconds_sum{application="adexchange",code_function="learningBin",code_namespace="io.adexchange.app.sim.SimulatorService",error="none",exception="none",outcome="SUCCESS"} 0.0051281
+tasks_scheduled_execution_seconds_count{application="adexchange",code_function="pollModel",code_namespace="io.adexchange.app.stats.StatsController",error="none",exception="none",outcome="SUCCESS"} 31
+tasks_scheduled_execution_seconds_sum{application="adexchange",code_function="pollModel",code_namespace="io.adexchange.app.stats.StatsController",error="none",exception="none",outcome="SUCCESS"} 0.1119615
+tasks_scheduled_execution_seconds_count{application="adexchange",code_function="relay",code_namespace="io.adexchange.app.campaign.CampaignService",error="none",exception="none",outcome="SUCCESS"} 1312
+tasks_scheduled_execution_seconds_sum{application="adexchange",code_function="relay",code_namespace="io.adexchange.app.campaign.CampaignService",error="none",exception="none",outcome="SUCCESS"} 0.0604717
+tasks_scheduled_execution_seconds_count{application="adexchange",code_function="reportNothing",code_namespace="io.adexchange.app.sim.SimulatorService",error="none",exception="none",outcome="SUCCESS"} 18
+tasks_scheduled_execution_seconds_sum{application="adexchange",code_function="reportNothing",code_namespace="io.adexchange.app.sim.SimulatorService",error="none",exception="none",outcome="SUCCESS"} 0.0041052
+tasks_scheduled_execution_seconds_count{application="adexchange",code_function="sample",code_namespace="io.adexchange.app.stats.StatsService",error="none",exception="none",outcome="SUCCESS"} 172
+tasks_scheduled_execution_seconds_sum{application="adexchange",code_function="sample",code_namespace="io.adexchange.app.stats.StatsService",error="none",exception="none",outcome="SUCCESS"} 0.4290132
+tasks_scheduled_execution_seconds_count{application="adexchange",code_function="tick",code_namespace="io.adexchange.app.config.PacingRegistry",error="none",exception="none",outcome="SUCCESS"} 279
+tasks_scheduled_execution_seconds_sum{application="adexchange",code_function="tick",code_namespace="io.adexchange.app.config.PacingRegistry",error="none",exception="none",outcome="SUCCESS"} 29.38412
+# HELP tasks_scheduled_execution_seconds_max  
+# TYPE tasks_scheduled_execution_seconds_max gauge
+tasks_scheduled_execution_seconds_max{application="adexchange",code_function="learningBin",code_namespace="io.adexchange.app.sim.SimulatorService",error="none",exception="none",outcome="SUCCESS"} 0.0039552
+tasks_scheduled_execution_seconds_max{application="adexchange",code_function="pollModel",code_namespace="io.adexchange.app.stats.StatsController",error="none",exception="none",outcome="SUCCESS"} 0.0981079
+tasks_scheduled_execution_seconds_max{application="adexchange",code_function="relay",code_namespace="io.adexchange.app.campaign.CampaignService",error="none",exception="none",outcome="SUCCESS"} 0.0042219
+tasks_scheduled_execution_seconds_max{application="adexchange",code_function="reportNothing",code_namespace="io.adexchange.app.sim.SimulatorService",error="none",exception="none",outcome="SUCCESS"} 0.0037328
+tasks_scheduled_execution_seconds_max{application="adexchange",code_function="sample",code_namespace="io.adexchange.app.stats.StatsService",error="none",exception="none",outcome="SUCCESS"} 0.0269872
+tasks_scheduled_execution_seconds_max{application="adexchange",code_function="tick",code_namespace="io.adexchange.app.config.PacingRegistry",error="none",exception="none",outcome="SUCCESS"} 20.7150284
+# HELP tomcat_sessions_active_current_sessions  
+# TYPE tomcat_sessions_active_current_sessions gauge
+tomcat_sessions_active_current_sessions{application="adexchange"} 0.0
+# HELP tomcat_sessions_active_max_sessions  
+# TYPE tomcat_sessions_active_max_sessions gauge
+tomcat_sessions_active_max_sessions{application="adexchange"} 0.0
+# HELP tomcat_sessions_alive_max_seconds  
+# TYPE tomcat_sessions_alive_max_seconds gauge
+tomcat_sessions_alive_max_seconds{application="adexchange"} 0.0
+# HELP tomcat_sessions_created_sessions_total  
+# TYPE tomcat_sessions_created_sessions_total counter
+tomcat_sessions_created_sessions_total{application="adexchange"} 0.0
+# HELP tomcat_sessions_expired_sessions_total  
+# TYPE tomcat_sessions_expired_sessions_total counter
+tomcat_sessions_expired_sessions_total{application="adexchange"} 0.0
+# HELP tomcat_sessions_rejected_sessions_total  
+# TYPE tomcat_sessions_rejected_sessions_total counter
+tomcat_sessions_rejected_sessions_total{application="adexchange"} 0.0

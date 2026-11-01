@@ -16,6 +16,10 @@ spring:
   threads:
     virtual:
       enabled: ${VIRTUAL_THREADS:true}   # hot-path concurrency model flag, benchmarked in docs/optimization.md
+  task:
+    scheduling:
+      pool:
+        size: 4   # lease tick, pacing, stats sampler and relay must not starve each other when one blocks
   jackson:
     default-property-inclusion: non_null
 
