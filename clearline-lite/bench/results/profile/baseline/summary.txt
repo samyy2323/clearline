@@ -1,0 +1,73 @@
+CPU samples: 1508
+
+by thread group:
+   95.6%  tomcat-handler
+    2.1%  main
+    0.7%  ForkJoinPool-1-worker
+    0.5%  background-preinit
+    0.3%  VirtualThread-unparker
+    0.2%  scheduling
+    0.2%  freqcap-writer
+    0.1%  Notification Thread
+
+top self time:
+    2.0%  java.util.HashMap.getNode
+    1.3%  io.adexchange.app.track.TrackingSigner.sign
+    1.3%  java.lang.String.equals
+    1.2%  io.adexchange.auction.scoring.PctrModel.fmix
+    1.1%  sun.reflect.generics.reflectiveObjects.WildcardTypeImpl.getUpperBounds
+    1.1%  java.util.HashMap.putVal
+    1.1%  org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver.readWithMessageConverters
+    1.0%  java.util.concurrent.ConcurrentHashMap.get
+    0.9%  com.fasterxml.jackson.core.json.UTF8JsonGenerator._writeStringSegment
+    0.9%  java.util.concurrent.ConcurrentHashMap.tabAt
+    0.8%  io.adexchange.auction.AuctionEngine.bid
+    0.7%  java.lang.String.length
+    0.7%  java.lang.StringLatin1.toLowerCase
+    0.7%  org.apache.tomcat.util.buf.MessageBytes.setString
+    0.7%  org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor.resolveArgument
+
+top inclusive (io.adexchange.*):
+   18.0%  io.adexchange.app.bid.BidController.bid
+   17.6%  io.adexchange.app.bid.BidGateway.handle
+    8.3%  io.adexchange.auction.AuctionEngine.bid
+    7.5%  io.adexchange.app.track.TrackingSigner.sign
+    4.0%  io.adexchange.app.track.TrackingSigner.mac
+    1.9%  io.adexchange.app.AdExchangeApplication.main
+    1.7%  io.adexchange.auction.scoring.PctrModel.predict
+    1.7%  io.adexchange.app.stats.StatsService.lambda$new$0
+    1.3%  io.adexchange.auction.scoring.PctrModel.index
+    1.2%  io.adexchange.auction.scoring.PctrModel.fmix
+    0.8%  io.adexchange.auction.index.CampaignIndex.candidates
+    0.7%  io.adexchange.freqcap.ResilientFrequencyCap.check
+    0.6%  io.adexchange.auction.scoring.PctrModel.requestFeatures
+    0.5%  io.adexchange.app.track.TrackingSigner.clean
+    0.5%  io.adexchange.app.bid.BidController.validate
+
+allocation sampled weight: 13.47 GB
+by class:
+   40.0%  byte[]
+   10.1%  char[]
+    5.1%  java.lang.String
+    3.5%  java.lang.Object[]
+    3.1%  java.lang.reflect.Type[]
+    1.7%  java.util.HashMap$Node[]
+    1.5%  java.util.ArrayList
+    1.5%  java.util.concurrent.ConcurrentHashMap$Node
+    1.2%  java.util.LinkedHashMap$Entry
+    1.2%  java.util.HashMap
+by allocating frame (first io.adexchange frame):
+   18.8%  com.fasterxml.jackson.core.util.BufferRecycler.balloc
+    9.6%  io.adexchange.app.track.TrackingSigner.sign
+    9.0%  io.adexchange.app.track.TrackingSigner.mac
+    8.9%  com.fasterxml.jackson.core.util.BufferRecycler.calloc
+    2.6%  io.adexchange.app.bid.BidGateway.handle
+    1.8%  java.lang.StringLatin1.toLowerCase
+    1.8%  io.adexchange.app.AdExchangeApplication.main
+    1.7%  java.util.HashMap.resize
+    1.7%  io.adexchange.auction.AuctionEngine.bid
+    1.5%  sun.reflect.generics.reflectiveObjects.WildcardTypeImpl.getUpperBounds
+
+GC: 28 collections, total pause 282.9 ms, max 18.70 ms, median 9.86 ms
+
+wrote bench\results\profile\baseline\flamegraph.svg and bench\results\profile\baseline\folded.txt

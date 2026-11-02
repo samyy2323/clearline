@@ -1,0 +1,13 @@
+target/
+node_modules/
+dist/
+*.class
+.idea/
+.vscode/
+*.log
+.env
+.tools/
+services/auction-engine/src/main/resources/static/
+data/
+ml/out/
+ml/out2/

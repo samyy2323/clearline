@@ -1,0 +1,12 @@
+# Laptop profile: one container, in-memory stores, small heap.
+name: adexchange-lite
+services:
+  app:
+    build: { context: .., dockerfile: Dockerfile }
+    environment:
+      PORT: 8080
+      JAVA_OPTS: "-Xms128m -Xmx384m -XX:+UseSerialGC"
+      AUTOSTART_SIM_RATE: ${AUTOSTART_SIM_RATE:-200}
+      EVENTS_LOG: ""
+    ports: ["8080:8080"]
+    mem_limit: 512m

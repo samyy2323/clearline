@@ -1,0 +1,56 @@
+@import '@fontsource-variable/inter-tight';
+@import '@fontsource/instrument-serif';
+@import '@fontsource/jetbrains-mono/400.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+html, body, #root { height: 100%; }
+body {
+  background: #0a0b0d;
+  color: #e8e4dc;
+  font-family: 'Inter Tight Variable', ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: 'tnum' 1, 'cv11' 1;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: rgba(201, 164, 92, 0.3); }
+* { scrollbar-width: thin; scrollbar-color: #2a2f37 transparent; }
+
+@layer components {
+  .card { @apply rounded-xl border border-line bg-panel p-5; }
+  .btn { @apply rounded-md bg-accent px-4 py-2 text-sm font-medium text-[#14110a] transition hover:brightness-110 disabled:opacity-40; }
+  .btn-ghost { @apply rounded-md border border-line px-3.5 py-2 text-sm text-slate-200 transition hover:border-[#2c323b] hover:bg-white/[0.03] disabled:opacity-40; }
+  .btn-danger { @apply rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:brightness-110; }
+  .input { @apply w-full rounded-md border border-line bg-ink px-3 py-2 text-sm outline-none transition placeholder:text-slate-500 focus:border-accent/70; }
+  .label { @apply mb-1.5 block text-[11px] font-medium uppercase tracking-[0.12em] text-slate-400; }
+  th { @apply px-3 py-2 text-left text-[11px] font-medium uppercase tracking-[0.1em] text-slate-400; }
+  td { @apply px-3 py-2.5 text-sm; }
+  .num { font-variant-numeric: tabular-nums; }
+  .hairline { @apply border-t border-line; }
+}
+
+/* ---------- splash ---------- */
+@keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeout { to { opacity: 0; visibility: hidden; } }
+@keyframes win { 0% { color: #8b8f98; } 100% { color: #c9a45c; } }
+@keyframes dim { to { opacity: 0.28; } }
+@keyframes grow { from { width: 0; } }
+
+.splash { animation: fadeout 0.7s ease 3.9s forwards; }
+.splash-line { transform-origin: left; animation: draw 1.2s cubic-bezier(.2,.7,.2,1) 0.2s both; }
+.splash-word { animation: rise 0.9s ease 0.5s both; }
+.splash-sub { animation: rise 0.9s ease 0.9s both; }
+.bid-row { animation: rise 0.5s ease both; }
+.bid-row.loser { animation: rise 0.5s ease both, dim 0.6s ease 3.0s forwards; }
+.bid-bar { animation: grow 0.9s cubic-bezier(.2,.7,.2,1) both; }
+.clear-note { animation: rise 0.6s ease 3.0s both; }
+
+.reveal { animation: rise 0.6s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .splash, .splash-line, .splash-word, .splash-sub, .bid-row, .bid-bar, .clear-note, .reveal { animation-duration: 0.01s; animation-delay: 0s; }
+}

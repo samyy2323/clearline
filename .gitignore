@@ -11,3 +11,4 @@ services/auction-engine/src/main/resources/static/
 data/
 ml/out/
 ml/out2/
+*.jfr
