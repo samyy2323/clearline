@@ -1,0 +1,10 @@
+# Apply with:  kubectl kustomize deploy/k8s --load-restrictor LoadRestrictionsNone | kubectl apply -f -
+# (the flag lets the ClickHouse init SQL be shared with the compose stack instead of duplicated)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: clearline
+resources: [namespace-config.yaml, data.yaml, app.yaml]
+configMapGenerator:
+  - name: clickhouse-init
+    files: [init.sql=../clickhouse/init.sql]
+generatorOptions: { disableNameSuffixHash: true }

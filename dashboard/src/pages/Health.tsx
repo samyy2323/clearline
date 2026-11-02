@@ -28,7 +28,9 @@ export default function Health() {
         <Stat label="Lease renew failures" value={leases.renewFailures} tone={leases.renewFailures ? 'warn' : 'good'} />
         <Stat label="Spend denied (fail-closed)" value={leases.spendDenied.toLocaleString()} sub="no lease budget left" />
         <Stat label="Freq-cap degraded" value={sys.degradedFreqCap.toLocaleString()} sub="fail-open lookups" tone={sys.degradedFreqCap ? 'warn' : 'good'} />
-        <Stat label="Kafka lag" value={snap.kafkaLag ?? 'n/a'} sub="lite mode has no Kafka" />
+        <Stat label="Event buffer" value={snap.events?.queueDepth ?? 'n/a'}
+          sub={snap.events?.sink === 'kafka' ? `${(snap.events.dropped ?? 0)} dropped, ${(snap.events.deadLettered ?? 0)} dead-lettered, ${(snap.events.lost ?? 0)} lost` : 'lite: no Kafka'}
+          tone={snap.events?.dropped || snap.events?.lost ? 'warn' : undefined} />
         <Stat label="In flight / shed" value={`${sys.inFlight} / ${sys.shed}`} />
       </div>
 
@@ -78,6 +80,21 @@ export default function Health() {
           <p className="mt-2 text-xs text-slate-500">Flagged events are counted and excluded from billing, never silently dropped.</p>
         </Section>
       </div>
+
+      {snap.reconciliation && (
+        <Section title="Budget reconciliation (booked at award vs billed)">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 text-sm">
+            <div><div className="label">Source of truth</div>{snap.reconciliation.source}</div>
+            <div><div className="label">Drift (booked - billed)</div>{(snap.reconciliation.driftMicros / 1e6).toFixed(2)} USD</div>
+            <div><div className="label">Credited back</div>{(snap.reconciliation.creditedMicros / 1e6).toFixed(2)} USD</div>
+            <div><div className="label">Campaign feed</div>{snap.campaignFeed?.mode}{snap.campaignFeed?.caughtUp === false ? ' (catching up)' : ''}</div>
+          </div>
+          <p className="mt-2 text-xs text-slate-500">
+            Spend is booked when a win is awarded and billed only when a signed impression arrives. Drift includes impressions still in
+            flight; only bookings older than the token lifetime ({Math.round((snap.reconciliation.lagMs ?? 0) / 60000)} min) are credited back.
+          </p>
+        </Section>
+      )}
 
       <Section title="Budget leases">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 text-sm">

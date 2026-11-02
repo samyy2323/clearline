@@ -9,6 +9,8 @@ import Campaigns from './pages/Campaigns'
 import Pricing from './pages/Pricing'
 import Health from './pages/Health'
 import Simulator from './pages/Simulator'
+import Reports from './pages/Reports'
+import { useQuery } from '@tanstack/react-query'
 
 const Icon = ({ d }: { d: string }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
@@ -19,11 +21,13 @@ const ICONS = {
   pricing: 'M12 3v18M7 8c0-2 2-3 5-3s5 1 5 3-2 3-5 3-5 1-5 3 2 3 5 3 5-1 5-3',
   health: 'M4 19V9m6 10V5m6 14v-7m4 7H2',
   sim: 'M5 4v16M12 4v16M19 4v16M3 9h4M10 15h4M17 7h4',
+  reports: 'M4 20h16M6 16V8m6 8V4m6 12v-6',
 }
 
 const TITLES: Record<string, [string, string]> = {
   '/live': ['Performance', 'Spend, pacing and delivery across your campaigns'],
   '/campaigns': ['Campaigns', 'Targeting, bids, budgets and flight dates'],
+  '/reports': ['Reports', 'Historical delivery and spend from the ClickHouse rollups'],
   '/pricing': ['Pricing experiment', 'First-price against generalized second-price on live traffic'],
   '/health': ['System health', 'Latency, throughput, budget safety and event integrity'],
   '/simulator': ['Traffic simulator', 'Scenario control, failure injection and the learning loop'],
@@ -103,6 +107,9 @@ function Shell({ onLogout }: { onLogout: () => void }) {
   const loc = useLocation()
   const [title, sub] = TITLES[loc.pathname] ?? TITLES['/live']
   const admin = s.role === 'admin'
+  // Reports exist only in the full edition (reporting service + ClickHouse); probe once and hide the tab otherwise
+  const reportsProbe = useQuery({ queryKey: ['reports-available'], queryFn: () => api('/api/reports/summary?minutes=5').then(() => true, () => false), staleTime: 60_000 })
+  const hasReports = reportsProbe.data === true
   const link = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 rounded-md px-3 py-2 text-[13px] transition ${isActive ? 'bg-white/[0.06] text-slate-100' : 'text-slate-400 hover:bg-white/[0.03] hover:text-slate-200'}`
   return (
@@ -113,6 +120,7 @@ function Shell({ onLogout }: { onLogout: () => void }) {
         <nav className="mt-6 flex gap-1 overflow-x-auto lg:flex-col">
           <NavLink to="/live" className={link}><Icon d={ICONS.live} />Performance</NavLink>
           <NavLink to="/campaigns" className={link}><Icon d={ICONS.campaigns} />Campaigns</NavLink>
+          {hasReports && <NavLink to="/reports" className={link}><Icon d={ICONS.reports} />Reports</NavLink>}
           {admin && <NavLink to="/pricing" className={link}><Icon d={ICONS.pricing} />Pricing experiment</NavLink>}
           {admin && <NavLink to="/health" className={link}><Icon d={ICONS.health} />System health</NavLink>}
           {admin && <NavLink to="/simulator" className={link}><Icon d={ICONS.sim} />Simulator</NavLink>}
@@ -144,6 +152,7 @@ function Shell({ onLogout }: { onLogout: () => void }) {
           <Routes>
             <Route path="/live" element={<Live />} />
             <Route path="/campaigns" element={<Campaigns />} />
+            {hasReports && <Route path="/reports" element={<Reports />} />}
             {admin && <Route path="/pricing" element={<Pricing />} />}
             {admin && <Route path="/health" element={<Health />} />}
             {admin && <Route path="/simulator" element={<Simulator />} />}

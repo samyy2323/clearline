@@ -1,0 +1,17 @@
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /w
+COPY pom.xml .
+COPY libs libs
+COPY services services
+COPY simulator simulator
+RUN mvn -B -q -DskipTests package -pl services/reporting-service -am
+
+FROM eclipse-temurin:21-jre-alpine
+RUN addgroup -S app && adduser -S app -G app
+WORKDIR /app
+COPY --from=build /w/services/reporting-service/target/reporting-service-1.0.0-SNAPSHOT.jar app.jar
+USER app
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=60" PORT=8081
+EXPOSE 8081
+HEALTHCHECK --interval=15s --timeout=3s --start-period=30s CMD wget -qO- http://localhost:${PORT}/actuator/health/liveness || exit 1
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
