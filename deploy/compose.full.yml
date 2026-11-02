@@ -59,7 +59,7 @@ services:
       - ./clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports: ["127.0.0.1:${CH_HOST_PORT:-58123}:8123"]
     ulimits: { nofile: { soft: 262144, hard: 262144 } }
-    healthcheck: { test: ["CMD-SHELL", "wget -qO- http://localhost:8123/ping"], interval: 5s, timeout: 3s, retries: 20 }
+    healthcheck: { test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8123/ping"], interval: 5s, timeout: 3s, retries: 20 }
 
   redis:
     image: redis:7-alpine
@@ -91,7 +91,10 @@ services:
       CLICKHOUSE_URL: http://clickhouse:8123
       CLICKHOUSE_USER: clearline
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clearline-dev}
+      REPORTING_URL: http://reporting:8081
       OTLP_TRACING_ENDPOINT: http://jaeger:4318/v1/traces
+      TRACING_ENABLED: "true"
+      TRACING_SAMPLE: ${TRACING_SAMPLE:-1.0}
       AUTOSTART_SIM_RATE: ${AUTOSTART_SIM_RATE:-300}
       EVENTS_LOG: ""
       JWT_SECRET: ${JWT_SECRET:-}
@@ -110,6 +113,8 @@ services:
       CLICKHOUSE_USER: clearline
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clearline-dev}
       OTLP_TRACING_ENDPOINT: http://jaeger:4318/v1/traces
+      TRACING_ENABLED: "true"
+      TRACING_SAMPLE: ${TRACING_SAMPLE:-1.0}
       JWT_SECRET: ${JWT_SECRET:-}
     ports: ["${REPORTING_PORT:-8081}:8081"]
 

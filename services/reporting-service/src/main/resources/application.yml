@@ -7,6 +7,11 @@ spring:
     virtual:
       enabled: true
 management:
+  observations:
+    enable:
+      tasks:
+        scheduled:
+          execution: false   # @Scheduled loops (outbox relay every 100 ms...) are not worth a trace each
   tracing:
     enabled: ${TRACING_ENABLED:false}
     sampling:

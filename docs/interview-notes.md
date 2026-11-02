@@ -56,5 +56,23 @@ in 1-15 ms quanta on Windows. I found it by decomposing latency into client queu
 same 2,000 req/s run dropped to p50 0.24 ms. The generator is open-loop and measures from the intended send time, and it reports
 its own CPU so it is never a hidden bottleneck.
 
+## Why Kafka between the app and ClickHouse, and what if Kafka is down?
+ADR 0008. The request path only offers an event to a bounded queue; a sender thread owns the producer with `max.block.ms=200`. If Kafka is slow or down the queue fills
+and events are dropped and counted (shedding), so auctions are unaffected. Failed deliveries go to a dead-letter topic. Billing is protected earlier: the event-id
+dedupe and the ledger live in the app, and ClickHouse is a reporting store, not the ledger. In a run with Kafka healthy the ledger and ClickHouse matched to the micro.
+
+## What does the transactional outbox buy you?
+A campaign write and its change event are one Postgres transaction, so the event can't be lost or announced without the write. `PgOutboxKafkaIT` proves a failed write leaves
+neither a row nor an event, that a delete travels as a Kafka tombstone, and that a brand-new engine rebuilds the identical index from the compacted topic without calling Postgres.
+Delivery is at-least-once, so the index apply is idempotent.
+
+## Does your reconciliation actually fix drift?
+Honest answer: it measures it and credits only what is provably unbillable, and in steady traffic that credit stays at zero (ADR 0009 has the numbers: 11-12% drift,
+0 credited). The conservative rule is safe and nearly inert; the exact fix is to key billed spend by booking time. I'd rather say that than claim it works.
+
+## Why ClickHouse and AggregatingMergeTree?
+Time-bucketed aggregates over a high-volume append-only stream. Materialized views write `sumState` partials per minute, queries use `sumMerge`, so results are right whether or not
+background merges have run. A test inserts two batches in the same minute and checks they combine rather than overwrite.
+
 ## What is not built?
 Kafka, ClickHouse, Postgres, Protobuf, cross-service tracing, Helm, WebFlux, Toxiproxy, Bloom tier, stretch items. See ADR 0006.

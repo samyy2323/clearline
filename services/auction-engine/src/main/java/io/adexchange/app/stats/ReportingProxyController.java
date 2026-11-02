@@ -1,6 +1,7 @@
 package io.adexchange.app.stats;
 
 import io.adexchange.app.config.ExchangeProperties;
+import io.micrometer.observation.ObservationRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,9 @@ class ReportingProxyController {
 
     private final RestClient client;
 
-    ReportingProxyController(RestClient.Builder builder, ExchangeProperties props) {
-        this.client = builder.baseUrl(props.reportingUrl()).build();
+    ReportingProxyController(RestClient.Builder builder, ObservationRegistry observations, ExchangeProperties props) {
+        // explicit registry: this is what makes the client span (and the traceparent header) exist, so the trace continues in reporting
+        this.client = builder.observationRegistry(observations).baseUrl(props.reportingUrl()).build();
     }
 
     @GetMapping({"/api/reports/summary", "/api/reports/campaigns", "/api/reports/timeseries", "/api/reports/breakdown", "/api/reports/flags"})

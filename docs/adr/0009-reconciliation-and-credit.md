@@ -27,3 +27,20 @@ Per-impression "reserve then confirm" accounting: exact but needs a durable pend
 Under-delivery from never-rendered wins is corrected with a 30-minute lag, not instantly. With several engines each one needs its own
 booked figure; the code and tests assume one. Covered by `ReconcilerTest` (no credit inside the token lifetime, credit once and
 idempotently afterwards, none when billing catches up, skip on an unavailable source).
+
+## Observed behaviour (clean run against real ClickHouse, 300 req/s, 120 s lag)
+
+| elapsed | booked | billed | drift | credited |
+|---|---|---|---|---|
+| 45 s | 32.6M | 29.5M | 3.3M | 0 |
+| 137 s | 77.7M | 69.2M | 9.7M | 0 |
+| 274 s | 132.2M | 116.7M | 16.8M | 0 |
+
+Drift is real (about 11-12% of booked spend never gets billed: impressions that are never viewed, plus bot traffic). The credit stayed at zero
+even after the 120 s lag, because `billed` includes bills for NEWER bookings, so while traffic is steady `B(T) - billed` is negative. The rule is safe but
+nearly inert in steady state; it only credits when billing for old bookings has stalled (for example a campaign that stopped or ended).
+
+**The fix, not built:** carry the booking time in the event (`booked_ms = token expiry - token lifetime`) and have ClickHouse sum billed spend for bookings made
+before `T` only. Then `credit = B(T) - billedForBookingsBefore(T)` is exact, because tokens for those bookings have expired. It needs a column in the event, the DDL and both
+spend sources (the lite ledger would need per-minute booking buckets). The in-memory booked counter also resets on engine restart while ClickHouse totals persist, so drift
+under-reports right after a restart; reading booked spend from the Redis ledger instead would fix that.
