@@ -6,7 +6,8 @@ services:
     environment:
       PORT: 8080
       JAVA_OPTS: "-Xms128m -Xmx384m -XX:+UseSerialGC"
-      AUTOSTART_SIM_RATE: ${AUTOSTART_SIM_RATE:-200}
+      AUTOSTART_SIM_RATE: ${AUTOSTART_SIM_RATE:-150}
+      SEED_BUDGET_SCALE: ${SEED_BUDGET_SCALE:-30}
       EVENTS_LOG: ""
     ports: ["8080:8080"]
     mem_limit: 512m

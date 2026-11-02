@@ -12,12 +12,15 @@ import io.adexchange.budget.LeaseStore;
 import io.adexchange.budget.RedisLeaseStore;
 import io.adexchange.clock.AdClock;
 import io.adexchange.freqcap.FrequencyCapStore;
+import io.adexchange.freqcap.TieredFrequencyCap;
 import io.adexchange.freqcap.InMemoryFrequencyCapStore;
 import io.adexchange.freqcap.RedisFrequencyCapStore;
 import io.adexchange.freqcap.ResilientFrequencyCap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
@@ -61,6 +64,16 @@ public class ExchangeConfig {
         return new ResilientFrequencyCap(faults.wrap(base), 50_000);
     }
 
+    /**
+     * Optional count-min tier in front of the frequency-cap store (FREQ_LOCAL_TIER=true): candidates provably below their cap are answered locally,
+     * so Redis only sees the ones near or over it. Primary, so the engine uses the tier when enabled and the plain resilient store otherwise.
+     */
+    @Bean
+    @Primary
+    FrequencyCapStore frequencyTier(ResilientFrequencyCap resilient, @Value("${exchange.freq-local-tier:false}") boolean enabled) {
+        return enabled ? new TieredFrequencyCap(resilient, 4, 1 << 16, 24, 3_600_000L) : resilient;
+    }
+
     /** Leases are an operational (real-time) concept, so they use wall time even when the sim clock is compressed. */
     @Bean(destroyMethod = "shutdown")
     LeaseManager leaseManager(LeaseStore store, ExchangeProperties p) {
@@ -89,7 +102,7 @@ public class ExchangeConfig {
     }
 
     @Bean
-    AuctionEngine auctionEngine(IndexHolder index, PctrModel model, ResilientFrequencyCap freq, LeaseManager leases,
+    AuctionEngine auctionEngine(IndexHolder index, PctrModel model, FrequencyCapStore freq, LeaseManager leases,
                                 PricingArms arms, ScalableClock clock) {
         return new AuctionEngine(index, model, freq, leases, arms, clock, AuctionEngine.Budgets.defaults());
     }

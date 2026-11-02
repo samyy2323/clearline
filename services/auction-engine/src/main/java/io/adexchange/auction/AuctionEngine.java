@@ -53,6 +53,7 @@ public final class AuctionEngine {
     private final Budgets budgets;
     private volatile StageRecorder recorder = (s, n) -> {};
     private volatile PacingGate pacing = id -> true;
+    private volatile AuctionObserver observer;
 
     public final LongAdder requests = new LongAdder();
     public final LongAdder bids = new LongAdder();
@@ -77,6 +78,10 @@ public final class AuctionEngine {
         this.recorder = r;
     }
 
+    public void setObserver(AuctionObserver o) {
+        this.observer = o;
+    }
+
     public void setPacing(PacingGate g) {
         this.pacing = g;
     }
@@ -92,6 +97,8 @@ public final class AuctionEngine {
 
     public BidResponse bid(BidRequest req) {
         final long t0 = System.nanoTime();
+        final AuctionObserver obs = observer;
+        final boolean tracing = obs != null && obs.wants();
         requests.increment();
         if (req == null || req.slots() == null || req.slots().isEmpty() || req.userId() == null) {
             return noBid(req == null ? new BidRequest("?", "", "", "", "", "", List.of(), List.of()) : req, NoBid.INVALID, null);
@@ -157,9 +164,14 @@ public final class AuctionEngine {
 
         List<BidResponse.Bid> won = new ArrayList<>(req.slots().size());
         boolean[] used = new boolean[k];
+        List<AuctionTrace.Slot> traceSlots = tracing ? new ArrayList<>() : null;
         int[] order = new int[k];
         for (BidRequest.Slot slot : req.slots()) {
             int m = 0;
+            boolean[] usedBefore = tracing ? used.clone() : null;
+            boolean[] denied = tracing ? new boolean[k] : null;
+            int winI = -1;
+            long winPrice = 0;
             for (int i = 0; i < k; i++) {
                 if (!eligible[i] || used[i]) continue;
                 Campaign c = top[i];
@@ -174,9 +186,12 @@ public final class AuctionEngine {
                 long perImpression = Math.max(1, price / 1000);
                 if (!leases.trySpend(c.id(), perImpression)) {
                     budgetDenied.increment();
+                    if (denied != null) denied[w] = true;
                     continue; // fail closed: no lease budget -> no bid for this campaign
                 }
                 used[w] = true;
+                winI = w;
+                winPrice = price;
                 won.add(new BidResponse.Bid(slot.id(), c.id(), c.advertiserId(), price, c.bidCpmMicros(), topPctr[w]));
                 arm.awards.increment();
                 arm.revenueMicros.add(perImpression);
@@ -184,10 +199,15 @@ public final class AuctionEngine {
                 freq.record(req.userId(), c.id(), now);
                 break;
             }
+            if (tracing) traceSlots.add(buildSlotTrace(slot, k, top, topPctr, topEcpm, capped, eligible, usedBefore, denied, winI, winPrice));
         }
         long t3 = System.nanoTime();
         recorder.record(Stage.BUDGET, t3 - t2);
         recorder.record(Stage.TOTAL, t3 - t0);
+        if (tracing) {
+            obs.accept(new AuctionTrace(req.id(), clock.nowMillis(), arm.name, req.publisherId(), req.siteCategory(), req.device(), req.geo(),
+                    req.segments(), (t3 - t0) / 1000, traceSlots));
+        }
         if (t3 - t2 > budgets.budgetNs || t3 - t0 > budgets.totalNs) {
             // too late to be useful; the spend already taken stays in the lease (conservative) and is reconciled
             return noBid(req, NoBid.TIMEOUT, arm);
@@ -195,5 +215,27 @@ public final class AuctionEngine {
         if (won.isEmpty()) return noBid(req, NoBid.NO_ELIGIBLE, arm);
         bids.increment();
         return new BidResponse(req.id(), won, null, wasDegraded, arm.name);
+    }
+
+    /** Explains one slot's auction: every top candidate with the reason it won or lost. Only runs for sampled auctions. */
+    private static AuctionTrace.Slot buildSlotTrace(BidRequest.Slot slot, int k, Campaign[] top, double[] pctr, double[] ecpm,
+                                                    boolean[] capped, boolean[] eligible, boolean[] usedBefore, boolean[] denied,
+                                                    int winI, long winPrice) {
+        List<AuctionTrace.Bidder> bidders = new ArrayList<>();
+        int shown = Math.min(k, 10);
+        for (int i = 0; i < k && (i < shown || i == winI); i++) {
+            Campaign c = top[i];
+            String outcome;
+            if (capped[i]) outcome = "FREQUENCY_CAP";
+            else if (!eligible[i]) outcome = "PACING";
+            else if (i == winI) outcome = "WON";
+            else if (usedBefore[i]) outcome = "WON_OTHER_SLOT";
+            else if (c.bidCpmMicros() < slot.floorCpmMicros()) outcome = "BELOW_FLOOR";
+            else if (!c.fits(slot.w(), slot.h())) outcome = "SIZE_MISMATCH";
+            else if (denied[i]) outcome = "NO_BUDGET";
+            else outcome = "OUTBID";
+            bidders.add(new AuctionTrace.Bidder(c.id(), c.name(), c.advertiserId(), c.bidCpmMicros(), pctr[i], ecpm[i], outcome));
+        }
+        return new AuctionTrace.Slot(slot.id(), slot.w(), slot.h(), slot.floorCpmMicros(), winI >= 0 ? top[winI].id() : null, winPrice, bidders);
     }
 }

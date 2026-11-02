@@ -99,9 +99,9 @@ export default function Simulator() {
           </div>
           <Section title="Learning loop: predicted CTR vs hidden true CTR">
             <LineChart x={learning.map((p) => timeLabel(p[0]))} yFormatter={(v) => `${(v * 100).toFixed(2)}%`} series={[
-              { name: 'predicted (model)', data: learning.map((p) => p[1]), color: '#c9a45c' },
-              { name: 'true (hidden)', data: learning.map((p) => p[2]), color: '#8fb8a8', dashed: true },
-              { name: 'observed', data: learning.map((p) => p[3]), color: '#7d93b2' },
+              { name: 'predicted (model)', data: learning.map((p) => p[1]), color: '#1d8f6e' },
+              { name: 'true (hidden)', data: learning.map((p) => p[2]), color: '#c8963e', dashed: true },
+              { name: 'observed', data: learning.map((p) => p[3]), color: '#4f7cac' },
             ]} />
             <p className="mt-1 text-xs text-slate-500">
               Train offline with <code>make train</code> (reads the impression/click log), the engine hot-reloads the weights, and the predicted line

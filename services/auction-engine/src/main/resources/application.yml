@@ -76,4 +76,5 @@ exchange:
   seed-demo: ${SEED_DEMO:true}
   seed-budget-scale: ${SEED_BUDGET_SCALE:1}
   autostart-sim-rate: ${AUTOSTART_SIM_RATE:0}
+  freq-local-tier: ${FREQ_LOCAL_TIER:false}   # count-min sketch in front of the frequency-cap store (docs/adr/0010)
   pacing-enabled: ${PACING_ENABLED:true}

@@ -19,7 +19,9 @@ import io.adexchange.auction.scoring.PctrModel;
 import io.adexchange.budget.LeaseManager;
 import io.adexchange.budget.LeaseStore;
 import io.adexchange.budget.PacingController;
+import io.adexchange.freqcap.FrequencyCapStore;
 import io.adexchange.freqcap.ResilientFrequencyCap;
+import io.adexchange.freqcap.TieredFrequencyCap;
 import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -61,6 +63,7 @@ public class StatsService {
     private final EventLog eventLog;
     private final SimulatorService sim;
     private final AdEventSink sink;
+    private final FrequencyCapStore frequencyStore;
     private final Reconciler reconciler;
     private final org.springframework.beans.factory.ObjectProvider<CampaignEventConsumer> campaignConsumer;
     private final ObjectMapper json = new ObjectMapper();
@@ -79,11 +82,11 @@ public class StatsService {
     public StatsService(AuctionEngine engine, BidGateway gateway, CampaignService campaigns, EventStats stats,
                         TrackerService tracker, LeaseManager leases, LeaseStore store, PacingRegistry pacing,
                         ScalableClock clock, ResilientFrequencyCap freq, PctrModel model, FaultInjector faults,
-                        EventLog eventLog, SimulatorService sim, AdEventSink sink, Reconciler reconciler,
+                        EventLog eventLog, SimulatorService sim, AdEventSink sink, FrequencyCapStore frequencyStore, Reconciler reconciler,
                         org.springframework.beans.factory.ObjectProvider<CampaignEventConsumer> campaignConsumer, MeterRegistry reg) {
         this.engine = engine; this.gateway = gateway; this.campaigns = campaigns; this.stats = stats;
         this.tracker = tracker; this.leases = leases; this.store = store; this.pacing = pacing; this.clock = clock;
-        this.freq = freq; this.model = model; this.faults = faults; this.eventLog = eventLog; this.sim = sim; this.sink = sink; this.reconciler = reconciler; this.campaignConsumer = campaignConsumer;
+        this.freq = freq; this.model = model; this.faults = faults; this.eventLog = eventLog; this.sim = sim; this.sink = sink; this.frequencyStore = frequencyStore; this.reconciler = reconciler; this.campaignConsumer = campaignConsumer;
 
         Timer[] timers = new Timer[stageRec.length];
         for (AuctionEngine.Stage s : AuctionEngine.Stage.values()) {
@@ -157,6 +160,7 @@ public class StatsService {
         List<Map<String, Object>> all = (List<Map<String, Object>>) snap.get("campaigns");
         m.put("campaigns", all.stream().filter(c -> s.advertiserId().equals(c.get("advertiserId"))).toList());
         m.remove("fraud");
+        m.remove("freqTier");
         m.remove("sim");
         m.remove("system");
         return m;
@@ -261,6 +265,7 @@ public class StatsService {
                 "spendDenied", leases.spendDenied.get(), "renewFailures", leases.renewFailures.get(),
                 "budgetDenied", engine.budgetDenied.sum(), "chunkMicros", 0));
         snap.put("events", sink.stats());
+        snap.put("freqTier", frequencyStore instanceof TieredFrequencyCap t ? t.stats() : Map.of("tier", "none"));
         snap.put("reconciliation", reconciler.status());
         CampaignEventConsumer cc = campaignConsumer.getIfAvailable();
         snap.put("campaignFeed", cc == null ? Map.of("mode", "in-process outbox")

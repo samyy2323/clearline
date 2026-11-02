@@ -53,8 +53,8 @@ export default function Live() {
           x={series.map((p) => simClock(p[0]))}
           yFormatter={(v) => `${(v * 100).toFixed(0)}%`}
           series={[
-            { name: 'target', data: series.map((p) => p[1]), color: '#8b8f98', dashed: true },
-            { name: 'actual', data: series.map((p) => p[2]), color: '#c9a45c', area: true },
+            { name: 'target', data: series.map((p) => p[1]), color: '#8d8a80', dashed: true },
+            { name: 'actual', data: series.map((p) => p[2]), color: '#1d8f6e', area: true },
           ]}
         />
       </Section>

@@ -1,0 +1,8 @@
+variant=A pair=1 cpu_before=27.1
+variant=B pair=1 cpu_before=10.5
+variant=A pair=2 cpu_before=6
+variant=B pair=2 cpu_before=7.8
+variant=A pair=3 cpu_before=8.4
+variant=B pair=3 cpu_before=7.6
+variant=A pair=4 cpu_before=13.6
+variant=B pair=4 cpu_before=6.6

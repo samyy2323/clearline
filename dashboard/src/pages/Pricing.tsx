@@ -23,8 +23,8 @@ export default function Pricing() {
           x={arms.map((a) => a.name)}
           yFormatter={(v) => usd(v)}
           series={[
-            { name: 'awarded at auction', data: arms.map((a) => a.awardedRevenueMicros), color: '#c9a45c' },
-            { name: 'billed (confirmed impressions)', data: arms.map((a) => a.billedRevenueMicros), color: '#8fb8a8' },
+            { name: 'awarded at auction', data: arms.map((a) => a.awardedRevenueMicros), color: '#1d8f6e' },
+            { name: 'billed (confirmed impressions)', data: arms.map((a) => a.billedRevenueMicros), color: '#c8963e' },
           ]}
         />
       </Section>

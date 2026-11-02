@@ -36,20 +36,20 @@ export default function Health() {
 
       <Section title="Latency percentiles (gateway-observed)">
         <LineChart x={x} yName="ms" series={[
-          { name: 'p50', data: h.map((p) => p.latencyMs.p50), color: '#8fb8a8' },
-          { name: 'p95', data: h.map((p) => p.latencyMs.p95), color: '#7d93b2' },
-          { name: 'p99', data: h.map((p) => p.latencyMs.p99), color: '#cf6f63' },
+          { name: 'p50', data: h.map((p) => p.latencyMs.p50), color: '#c8963e' },
+          { name: 'p95', data: h.map((p) => p.latencyMs.p95), color: '#4f7cac' },
+          { name: 'p99', data: h.map((p) => p.latencyMs.p99), color: '#d1586a' },
         ]} />
       </Section>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Section title="Throughput">
-          <LineChart x={x} height={200} series={[{ name: 'req/s', data: h.map((p) => p.rps), color: '#c9a45c', area: true }]} />
+          <LineChart x={x} height={200} series={[{ name: 'req/s', data: h.map((p) => p.rps), color: '#1d8f6e', area: true }]} />
         </Section>
         <Section title="No-bid and error rate">
           <LineChart x={x} height={200} yFormatter={(v) => `${(v * 100).toFixed(0)}%`} series={[
-            { name: 'no-bid', data: h.map((p) => p.noBidRate), color: '#8b8f98' },
-            { name: 'error', data: h.map((p) => p.errorRate), color: '#cf6f63' },
+            { name: 'no-bid', data: h.map((p) => p.noBidRate), color: '#8d8a80' },
+            { name: 'error', data: h.map((p) => p.errorRate), color: '#d1586a' },
           ]} />
         </Section>
       </div>

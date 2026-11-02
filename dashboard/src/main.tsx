@@ -3,7 +3,10 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { applyTheme, initialTheme } from './theme'
 import './index.css'
+
+applyTheme(initialTheme())   // before first paint, so there is no flash of the wrong theme
 
 const qc = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } } })
 

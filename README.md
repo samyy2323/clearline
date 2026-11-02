@@ -44,7 +44,7 @@ Set `ADMIN_PASSWORD`, `ADVERTISER_PASSWORD`, `JWT_SECRET`, `HMAC_SECRET` for any
   with late-spend tombstones; jqwik-tested overspend bound. PID-style pacing with an injectable clock. **Reconciliation** compares booked
   spend with ClickHouse-confirmed spend, emits a drift metric and **exactly** credits back spend that can no longer be billed, using the booking time carried in every event ([ADR 0009](docs/adr/0009-reconciliation-and-credit.md)).
 - **Frequency caps.** Sliding window of time buckets; a Redis batch lookup is one Lua call; fails open and is guarded by a Resilience4j
-  circuit breaker that also trips on slow calls.
+  circuit breaker that also trips on slow calls. An optional count-min tier answers most lookups locally (a 24 MiB sketch cut Redis lookups to 15% of checks with 0 wrong answers; [ADR 0010](docs/adr/0010-count-min-frequency-tier.md)).
 - **Events (full).** Signed, expiring win/impression/click URLs; dedupe; fraud flags (bots, click-without-impression, floods, duplicates)
   that are shipped and counted, never silently dropped; bounded buffer, dead-letter topic and load shedding in front of Kafka ([ADR 0008](docs/adr/0008-kafka-clickhouse-event-pipeline.md)).
 - **Analytics (full).** ClickHouse Kafka-engine table, materialized views, `AggregatingMergeTree` per-minute rollups by campaign,
@@ -52,8 +52,11 @@ Set `ADMIN_PASSWORD`, `ADVERTISER_PASSWORD`, `JWT_SECRET`, `HMAC_SECRET` for any
 - **Learning loop.** Offline Python trainer (log loss, AUC, calibration), atomic weight export, hot reload; a Java test proves training and
   serving hash identically.
 - **Security.** JWT roles (admin, advertiser) with tenant isolation, input validation, per-IP rate limit and load shedding, secrets from env.
-- **Dashboard.** React + TypeScript + TanStack Query + ECharts: performance and pacing, campaign CRUD, pricing experiment, system health
+- **Dashboard.** React + TypeScript + TanStack Query + ECharts, light and dark theme: performance and pacing, campaign CRUD, pricing experiment, system health
   (the proof screen), simulator with failure injection, and (full) a Reports page from ClickHouse.
+- **Live auction page (admin).** A mock publisher page whose ad slots change as real auctions resolve: each sampled auction is shown with every bidder's bid, predicted CTR
+  and score, why each rival lost or was filtered out (frequency cap, pacing, floor, budget), the winner and the price it pays (the page's explanation text is computed from the same
+  numbers as the engine's second-price rule). Creatives are original brand-coloured designs, not copied logos. Advertisers cannot open it (it shows rivals' bids).
 - **Observability.** Micrometer + Prometheus, provisioned Grafana dashboard, OpenTelemetry traces to Jaeger.
 - **Simulator.** Open-loop HTTP load generator (HdrHistogram, seeded, measures from intended send time, reports its own CPU) plus an
   in-process behavior simulator with hidden true CTR, duplicate clicks, click floods and bots; a k6 script for cross-checking.
@@ -89,8 +92,8 @@ but was not separately load-tested.
 
 Raw output: `bench/results/baseline-steady-5000/`. Budgets were scaled up for the run so campaigns did not run dry (no-bid 0%). Not run:
 10,000-20,000 req/s (needs a larger machine), the 1 h soak, and a clean k6 comparison. Config experiments, the GC comparison and a
-profile-driven set of fixes are in [docs/optimization.md](docs/optimization.md); the profile-driven fixes were **not** re-benchmarked on a
-quiet machine (an unrelated process was using half the CPU), so no latency gain is claimed for them. See `bench/results/INVALID-RUNS.md`.
+profile-driven set of fixes are in [docs/optimization.md](docs/optimization.md); the profile-driven fixes were measured in an interleaved A/B on a quiet machine: they **halve GC work** (24 to 13 collections per run, all 8 runs agree) but the
+latency tail difference is within run-to-run noise at this sample size, so no latency gain is claimed (section 4 of that doc; `bench/results/ab/`).
 
 ## Chaos results
 
@@ -120,7 +123,7 @@ Evidence in `bench/results/learning/`. The first attempt had AUC 0.50 (unlearnab
 
 ## What was verified
 
-- `make test`: 50 tests, green on a full run across all modules: unit, jqwik property and Testcontainers tests, including **Postgres + Kafka** (atomic outbox rollback, tombstones, replay from
+- `make test`:  tests, green on a full run across all modules: unit, jqwik property and Testcontainers tests, including **Postgres + Kafka** (atomic outbox rollback, tombstones, replay from
   the compacted topic), a **ClickHouse** rollup test running the real DDL, Redis Lua scripts, the Kafka sink (delivery, DLQ, shedding, dead broker),
   reconciliation, and Java/Python hashing parity.
 - **Full stack as containers (`deploy/compose.full.yml`):** app, reporting, Kafka, Postgres, ClickHouse, Redis, Jaeger, Prometheus and Grafana all ran healthy.
@@ -140,9 +143,9 @@ Evidence in `bench/results/learning/`. The first attempt had AUC 0.50 (unlearnab
 ## Known limitations and what is not built
 
 - Reconciliation reads booked spend from one engine's in-memory counter (resets on restart; one engine only), not yet from the Redis ledger.
-- Protobuf and a schema registry (JSON is used), a WebFlux gateway, Toxiproxy network chaos, a Bloom/count-min frequency tier, exactly-once delivery
+- Protobuf and a schema registry (JSON is used), a WebFlux gateway, Toxiproxy network chaos, exactly-once delivery
   to ClickHouse, the stretch items (replay, bid shading). See [ADR 0006](docs/adr/0006-lite-mode-and-scope.md).
-- JFR profiling was done and three fixes made, but their latency effect is unmeasured (see above).
+- Three profile-driven fixes were made; they halve GC work but their latency effect is not statistically established (see above).
 - With $5 leases a popular campaign can drain a lease faster than the 500 ms renewal tick at 5,000 req/s (377,633 denied spends in the baseline); no-bid stayed 0%,
   but that campaign loses fill. Size chunks from observed spend rate, or renew faster.
 - Synthetic traffic: the learned model and the pricing comparison describe the simulator, not a market.

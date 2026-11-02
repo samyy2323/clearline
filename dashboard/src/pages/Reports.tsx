@@ -45,8 +45,8 @@ export default function Reports() {
         <LineChart
           x={t.map((p) => label(p.t))}
           series={[
-            { name: 'impressions / min', data: t.map((p) => p.imps), color: '#c9a45c', area: true },
-            { name: 'clicks / min', data: t.map((p) => p.clicks), color: '#8fb8a8' },
+            { name: 'impressions / min', data: t.map((p) => p.imps), color: '#1d8f6e', area: true },
+            { name: 'clicks / min', data: t.map((p) => p.clicks), color: '#c8963e' },
           ]}
         />
       </Section>
@@ -58,7 +58,7 @@ export default function Reports() {
           </select>}>
           <BarChart x={(breakdown.data ?? []).slice(0, 10).map((r) => String(r.k).replace(/^c\d+-/, '#'))} height={230}
             yFormatter={(v) => usd(v)}
-            series={[{ name: 'billed spend', data: (breakdown.data ?? []).slice(0, 10).map((r) => r.spend), color: '#c9a45c' }]} />
+            series={[{ name: 'billed spend', data: (breakdown.data ?? []).slice(0, 10).map((r) => r.spend), color: '#1d8f6e' }]} />
         </Section>
 
         <Section title="Top campaigns">
