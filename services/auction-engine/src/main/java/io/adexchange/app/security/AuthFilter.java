@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import io.adexchange.auth.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,7 +30,7 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
         String h = req.getHeader("Authorization");
-        Jwt.Claims c = (h != null && h.startsWith("Bearer ")) ? jwt.verify(h.substring(7)) : null;
+        io.adexchange.auth.Jwt.Claims c = (h != null && h.startsWith("Bearer ")) ? jwt.verify(h.substring(7)) : null;
         if (c == null) {
             res.setStatus(401);
             res.setContentType("application/json");
@@ -40,7 +41,7 @@ public class AuthFilter extends OncePerRequestFilter {
         chain.doFilter(req, res);
     }
 
-    public static Jwt.Claims claims(HttpServletRequest r) {
-        return (Jwt.Claims) r.getAttribute(ATTR);
+    public static io.adexchange.auth.Jwt.Claims claims(HttpServletRequest r) {
+        return (io.adexchange.auth.Jwt.Claims) r.getAttribute(ATTR);
     }
 }

@@ -28,15 +28,25 @@ public class TrackerService {
     private volatile RotatingDedupe winSeen = new RotatingDedupe(2_000_000);
     private final EventStats stats;
     private final EventLog eventLog;
+    private final AdEventSink sink;
 
     private final Map<String, AtomicInteger> userClicks = new ConcurrentHashMap<>();
     private final Map<String, AtomicInteger> ipClicks = new ConcurrentHashMap<>();
     private volatile long windowStart = System.currentTimeMillis();
 
-    public TrackerService(ExchangeProperties props, EventStats stats, EventLog eventLog) {
+    public TrackerService(ExchangeProperties props, EventStats stats, EventLog eventLog, AdEventSink sink) {
         this.signer = new TrackingSigner(props.hmacSecret());
         this.stats = stats;
         this.eventLog = eventLog;
+        this.sink = sink;
+    }
+
+    private void emit(String type, TrackingSigner.Ticket t, long spend, String flag) {
+        try {
+            sink.publish(AdEvent.of(type, t, spend, flag));
+        } catch (RuntimeException e) {
+            // the sink must never break tracking; it counts its own failures
+        }
     }
 
     public TrackingSigner signer() {
@@ -85,35 +95,42 @@ public class TrackerService {
 
         if (userAgent != null && BOT.matcher(userAgent).find()) {
             stats.flag(type, "BOT_UA", t.campaign(), ip);
+                emit(type, t, 0, "BOT_UA");
             return Outcome.FLAGGED_BOT;
         }
         switch (type) {
             case "win" -> {
                 if (!winSeen.addIfAbsent(id)) {
                     stats.flag(type, "DUPLICATE", t.campaign(), ip);
+                emit(type, t, 0, "DUPLICATE");
                     return Outcome.DUPLICATE;
                 }
                 stats.wins.increment();
+                emit("win", t, 0, "");
                 return Outcome.ACCEPTED;
             }
             case "imp" -> {
                 long amount = Math.max(1, t.priceCpmMicros() / 1000);
                 if (!ledger.billImpression(id, t.campaign(), t.arm(), amount)) {
                     stats.flag(type, "DUPLICATE", t.campaign(), ip);
+                emit(type, t, 0, "DUPLICATE");
                     return Outcome.DUPLICATE;
                 }
                 c.imps.increment();
                 c.predCtrMicros.add((long) (t.pctr() * 1_000_000));
                 eventLog.impression(t);
+                emit("imp", t, amount, "");
                 return Outcome.ACCEPTED;
             }
             case "click" -> {
                 if (!ledger.hasImpression(id)) {
                     stats.flag(type, "CLICK_WITHOUT_IMPRESSION", t.campaign(), ip);
+                emit(type, t, 0, "CLICK_WITHOUT_IMPRESSION");
                     return Outcome.FLAGGED_NO_IMPRESSION;
                 }
                 if (!clickSeen.addIfAbsent(id)) {
                     stats.flag(type, "DUPLICATE", t.campaign(), ip);
+                emit(type, t, 0, "DUPLICATE");
                     return Outcome.DUPLICATE;
                 }
                 rollWindow(now);
@@ -121,10 +138,12 @@ public class TrackerService {
                 int i = ipClicks.computeIfAbsent(ip == null ? "?" : ip, k -> new AtomicInteger()).incrementAndGet();
                 if (u > MAX_CLICKS_PER_USER_PER_MIN || i > MAX_CLICKS_PER_IP_PER_MIN) {
                     stats.flag(type, "CLICK_FLOOD", t.campaign(), ip);
+                emit(type, t, 0, "CLICK_FLOOD");
                     return Outcome.FLAGGED_CLICK_FLOOD;
                 }
                 c.clicks.increment();
                 eventLog.click(t);
+                emit("click", t, 0, "");
                 return Outcome.ACCEPTED;
             }
             default -> {

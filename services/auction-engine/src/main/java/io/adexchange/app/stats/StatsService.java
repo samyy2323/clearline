@@ -7,6 +7,9 @@ import io.adexchange.app.config.PacingRegistry;
 import io.adexchange.app.config.ScalableClock;
 import io.adexchange.app.fault.FaultInjector;
 import io.adexchange.app.sim.SimulatorService;
+import io.adexchange.app.kafka.CampaignEventConsumer;
+import io.adexchange.app.recon.Reconciler;
+import io.adexchange.app.track.AdEventSink;
 import io.adexchange.app.track.EventLog;
 import io.adexchange.app.track.EventStats;
 import io.adexchange.app.track.TrackerService;
@@ -57,6 +60,9 @@ public class StatsService {
     private final FaultInjector faults;
     private final EventLog eventLog;
     private final SimulatorService sim;
+    private final AdEventSink sink;
+    private final Reconciler reconciler;
+    private final org.springframework.beans.factory.ObjectProvider<CampaignEventConsumer> campaignConsumer;
     private final ObjectMapper json = new ObjectMapper();
 
     private final Recorder[] stageRec = new Recorder[AuctionEngine.Stage.values().length];
@@ -73,10 +79,11 @@ public class StatsService {
     public StatsService(AuctionEngine engine, BidGateway gateway, CampaignService campaigns, EventStats stats,
                         TrackerService tracker, LeaseManager leases, LeaseStore store, PacingRegistry pacing,
                         ScalableClock clock, ResilientFrequencyCap freq, PctrModel model, FaultInjector faults,
-                        EventLog eventLog, SimulatorService sim, MeterRegistry reg) {
+                        EventLog eventLog, SimulatorService sim, AdEventSink sink, Reconciler reconciler,
+                        org.springframework.beans.factory.ObjectProvider<CampaignEventConsumer> campaignConsumer, MeterRegistry reg) {
         this.engine = engine; this.gateway = gateway; this.campaigns = campaigns; this.stats = stats;
         this.tracker = tracker; this.leases = leases; this.store = store; this.pacing = pacing; this.clock = clock;
-        this.freq = freq; this.model = model; this.faults = faults; this.eventLog = eventLog; this.sim = sim;
+        this.freq = freq; this.model = model; this.faults = faults; this.eventLog = eventLog; this.sim = sim; this.sink = sink; this.reconciler = reconciler; this.campaignConsumer = campaignConsumer;
 
         Timer[] timers = new Timer[stageRec.length];
         for (AuctionEngine.Stage s : AuctionEngine.Stage.values()) {
@@ -253,7 +260,12 @@ public class StatsService {
                 "acquired", leases.leasesAcquired.get(), "spendApproved", leases.spendApproved.get(),
                 "spendDenied", leases.spendDenied.get(), "renewFailures", leases.renewFailures.get(),
                 "budgetDenied", engine.budgetDenied.sum(), "chunkMicros", 0));
-        snap.put("kafkaLag", null); // lite mode has no Kafka; full mode exposes consumer lag here
+        snap.put("events", sink.stats());
+        snap.put("reconciliation", reconciler.status());
+        CampaignEventConsumer cc = campaignConsumer.getIfAvailable();
+        snap.put("campaignFeed", cc == null ? Map.of("mode", "in-process outbox")
+                : Map.of("mode", "kafka compacted topic", "caughtUp", cc.caughtUp(), "applied", cc.applied.get(), "skipped", cc.skipped.get()));
+        snap.put("kafkaLag", null);
         snap.put("model", Map.of("version", model.version(), "source", model.source()));
         snap.put("fraud", Map.of("flagged", toMap(stats.flagged), "rejected", toMap(stats.rejected), "recent", stats.recentFlags().size()));
         snap.put("system", Map.of(

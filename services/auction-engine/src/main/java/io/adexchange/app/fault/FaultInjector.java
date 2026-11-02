@@ -29,6 +29,7 @@ public final class FaultInjector {
             public Grant acquire(String c, String l, long r, long n, long t) { before(); return d.acquire(c, l, r, n, t); }
             public void settle(String c, String l, long s, long n) { before(); d.settle(c, l, s, n); }
             public void release(String c, String l, long s, long n) { before(); d.release(c, l, s, n); }
+            public long credit(String c, long m, long n) { before(); return d.credit(c, m, n); }
             public long available(String c, long n) { return d.available(c, n); }
             public long committed(String c, long n) { return d.committed(c, n); }
         };

@@ -1,7 +1,7 @@
 package io.adexchange.app.campaign;
 
 import io.adexchange.app.security.AuthFilter;
-import io.adexchange.app.security.Jwt;
+
 import io.adexchange.auction.model.Campaign;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -78,7 +78,7 @@ class CampaignController {
         return m;
     }
 
-    private Campaign owned(String id, Jwt.Claims cl) {
+    private Campaign owned(String id, io.adexchange.auth.Jwt.Claims cl) {
         Campaign c = service.get(id);
         // 404 (not 403) for other tenants' campaigns so ids can't be probed
         if (c == null || (!cl.admin() && !c.advertiserId().equals(cl.advertiserId())))
@@ -88,7 +88,7 @@ class CampaignController {
 
     @GetMapping
     List<Map<String, Object>> list(HttpServletRequest req) {
-        Jwt.Claims cl = AuthFilter.claims(req);
+        io.adexchange.auth.Jwt.Claims cl = AuthFilter.claims(req);
         Collection<Campaign> src = cl.admin() ? service.all() : service.forAdvertiser(cl.advertiserId());
         return src.stream().sorted(Comparator.comparing(Campaign::id)).map(CampaignController::view).toList();
     }
@@ -100,7 +100,7 @@ class CampaignController {
 
     @PostMapping
     ResponseEntity<Map<String, Object>> create(@Valid @RequestBody CampaignIn in, HttpServletRequest req) {
-        Jwt.Claims cl = AuthFilter.claims(req);
+        io.adexchange.auth.Jwt.Claims cl = AuthFilter.claims(req);
         String adv = cl.admin() ? (in.advertiserId() == null || in.advertiserId().isBlank() ? "adv-1" : in.advertiserId()) : cl.advertiserId();
         Campaign c = service.save(toDomain("c-" + UUID.randomUUID().toString().substring(0, 8), adv, in));
         return ResponseEntity.status(HttpStatus.CREATED).body(view(c));

@@ -13,6 +13,11 @@ server:
 spring:
   application:
     name: adexchange
+  autoconfigure:
+    # lite mode has no database: the full profile (application-full.yml) turns these back on
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
   threads:
     virtual:
       enabled: ${VIRTUAL_THREADS:true}   # hot-path concurrency model flag, benchmarked in docs/optimization.md
@@ -24,6 +29,13 @@ spring:
     default-property-inclusion: non_null
 
 management:
+  tracing:
+    enabled: ${TRACING_ENABLED:false}
+    sampling:
+      probability: ${TRACING_SAMPLE:0.05}
+  otlp:
+    tracing:
+      endpoint: ${OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
   endpoints:
     web:
       exposure:
@@ -37,6 +49,13 @@ management:
       application: adexchange
 
 exchange:
+  mode: ${EXCHANGE_MODE:lite}                # lite | full (full = Postgres outbox, Kafka, ClickHouse)
+  kafka-bootstrap: ${KAFKA_BOOTSTRAP:localhost:9092}
+  clickhouse-url: ${CLICKHOUSE_URL:http://localhost:8123}
+  clickhouse-user: ${CLICKHOUSE_USER:clearline}
+  clickhouse-password: ${CLICKHOUSE_PASSWORD:clearline-dev}
+  reporting-url: ${REPORTING_URL:http://localhost:8081}
+  reconcile-lag-ms: ${RECONCILE_LAG_MS:1800000}   # = tracking-token TTL: only bookings older than this can be judged "never billed"
   pricing: ${PRICING:ab}                    # first | gsp | ab
   lease-chunk-micros: ${LEASE_CHUNK_MICROS:5000000}
   lease-ttl-ms: ${LEASE_TTL_MS:60000}

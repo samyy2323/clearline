@@ -31,6 +31,14 @@ public interface LeaseStore {
     /** Closes a lease returning {@code granted - spentTotal} to the pool (idempotent). */
     void release(String campaignId, String leaseId, long spentTotalMicros, long nowMillis);
 
+    /**
+     * Returns budget that was booked as spent but never billed (reconciliation). Never reduces {@code committed} below the amount
+     * still held by open leases. Returns the amount actually credited.
+     */
+    default long credit(String campaignId, long micros, long nowMillis) {
+        throw new UnsupportedOperationException("credit not supported by " + getClass().getSimpleName());
+    }
+
     /** Uncommitted budget after reclaiming expired leases. */
     long available(String campaignId, long nowMillis);
 

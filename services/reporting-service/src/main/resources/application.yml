@@ -1,0 +1,32 @@
+server:
+  port: ${PORT:8081}
+spring:
+  application:
+    name: reporting
+  threads:
+    virtual:
+      enabled: true
+management:
+  tracing:
+    enabled: ${TRACING_ENABLED:false}
+    sampling:
+      probability: ${TRACING_SAMPLE:0.2}
+  otlp:
+    tracing:
+      endpoint: ${OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: reporting
+reporting:
+  clickhouse-url: ${CLICKHOUSE_URL:http://localhost:8123}
+  clickhouse-user: ${CLICKHOUSE_USER:clearline}
+  clickhouse-password: ${CLICKHOUSE_PASSWORD:clearline-dev}
+  jwt-secret: ${JWT_SECRET:}

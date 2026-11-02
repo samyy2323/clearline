@@ -4,7 +4,7 @@ import io.adexchange.app.campaign.CampaignService;
 import io.adexchange.app.config.ExchangeProperties;
 import io.adexchange.app.fault.FaultInjector;
 import io.adexchange.app.security.AuthFilter;
-import io.adexchange.app.security.Jwt;
+
 import io.adexchange.app.sim.SimulatorService;
 import io.adexchange.app.track.EventStats;
 import io.adexchange.auction.model.Campaign;
@@ -47,8 +47,8 @@ class StatsController {
         this.props = props;
     }
 
-    private static Jwt.Claims admin(HttpServletRequest r) {
-        Jwt.Claims c = AuthFilter.claims(r);
+    private static io.adexchange.auth.Jwt.Claims admin(HttpServletRequest r) {
+        io.adexchange.auth.Jwt.Claims c = AuthFilter.claims(r);
         if (!c.admin()) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "admin only");
         return c;
     }
@@ -64,13 +64,13 @@ class StatsController {
 
     @GetMapping(value = "/stream", produces = "text/event-stream")
     SseEmitter stream(HttpServletRequest r) {
-        Jwt.Claims c = AuthFilter.claims(r);
+        io.adexchange.auth.Jwt.Claims c = AuthFilter.claims(r);
         return stats.subscribe(c.admin(), c.advertiserId());
     }
 
     @GetMapping("/snapshot")
     Map<String, Object> snapshot(HttpServletRequest r) {
-        Jwt.Claims c = AuthFilter.claims(r);
+        io.adexchange.auth.Jwt.Claims c = AuthFilter.claims(r);
         return stats.latest(c.admin(), c.advertiserId());
     }
 
@@ -82,7 +82,7 @@ class StatsController {
 
     @GetMapping("/campaigns/{id}/pacing")
     List<double[]> pacing(@PathVariable String id, HttpServletRequest r) {
-        Jwt.Claims c = AuthFilter.claims(r);
+        io.adexchange.auth.Jwt.Claims c = AuthFilter.claims(r);
         Campaign camp = campaigns.get(id);
         if (camp == null || (!c.admin() && !camp.advertiserId().equals(c.advertiserId())))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

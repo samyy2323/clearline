@@ -16,7 +16,7 @@ public final class RedisLeaseStore implements LeaseStore, AutoCloseable {
 
     private final RedisClient client;
     private final StatefulRedisConnection<String, String> conn;
-    private final String acquire, settle, release, available;
+    private final String acquire, settle, release, available, credit;
 
     public RedisLeaseStore(String redisUri) {
         this.client = RedisClient.create(redisUri);
@@ -26,6 +26,7 @@ public final class RedisLeaseStore implements LeaseStore, AutoCloseable {
         this.settle = common + load("lua/settle.lua");
         this.release = common + load("lua/release.lua");
         this.available = common + load("lua/available.lua");
+        this.credit = common + load("lua/credit.lua");
     }
 
     private static String load(String path) {
@@ -69,6 +70,12 @@ public final class RedisLeaseStore implements LeaseStore, AutoCloseable {
     public void release(String campaignId, String leaseId, long spent, long now) {
         r().eval(release, ScriptOutputType.INTEGER, keys(campaignId),
                 Long.toString(now), leaseId, Long.toString(spent));
+    }
+
+    @Override
+    public long credit(String campaignId, long micros, long now) {
+        Object res = r().eval(credit, ScriptOutputType.VALUE, keys(campaignId), Long.toString(now), Long.toString(micros));
+        return Long.parseLong(res.toString());
     }
 
     @Override

@@ -11,9 +11,12 @@
 
   <modules>
     <module>libs/clock</module>
+    <module>libs/auth</module>
+    <module>libs/clickhouse-client</module>
     <module>libs/budget</module>
     <module>libs/frequency-cap-lib</module>
     <module>services/auction-engine</module>
+    <module>services/reporting-service</module>
     <module>simulator</module>
   </modules>
 
@@ -48,6 +51,8 @@
         <scope>import</scope>
       </dependency>
       <dependency><groupId>io.adexchange</groupId><artifactId>clock</artifactId><version>${project.version}</version></dependency>
+      <dependency><groupId>io.adexchange</groupId><artifactId>auth</artifactId><version>${project.version}</version></dependency>
+      <dependency><groupId>io.adexchange</groupId><artifactId>clickhouse-client</artifactId><version>${project.version}</version></dependency>
       <dependency><groupId>io.adexchange</groupId><artifactId>budget</artifactId><version>${project.version}</version></dependency>
       <dependency><groupId>io.adexchange</groupId><artifactId>frequency-cap-lib</artifactId><version>${project.version}</version></dependency>
       <dependency><groupId>io.lettuce</groupId><artifactId>lettuce-core</artifactId><version>${lettuce.version}</version></dependency>
@@ -55,6 +60,9 @@
       <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><version>${assertj.version}</version></dependency>
       <dependency><groupId>org.testcontainers</groupId><artifactId>testcontainers</artifactId><version>${testcontainers.version}</version></dependency>
       <dependency><groupId>org.testcontainers</groupId><artifactId>junit-jupiter</artifactId><version>${testcontainers.version}</version></dependency>
+      <dependency><groupId>org.testcontainers</groupId><artifactId>postgresql</artifactId><version>${testcontainers.version}</version></dependency>
+      <dependency><groupId>org.testcontainers</groupId><artifactId>kafka</artifactId><version>${testcontainers.version}</version></dependency>
+      <dependency><groupId>org.testcontainers</groupId><artifactId>clickhouse</artifactId><version>${testcontainers.version}</version></dependency>
       <dependency><groupId>org.hdrhistogram</groupId><artifactId>HdrHistogram</artifactId><version>${hdrhistogram.version}</version></dependency>
       <dependency><groupId>it.unimi.dsi</groupId><artifactId>fastutil</artifactId><version>${fastutil.version}</version></dependency>
     </dependencies>

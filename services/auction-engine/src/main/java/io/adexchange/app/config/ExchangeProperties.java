@@ -5,6 +5,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /** All knobs come from env/application.yml; secrets have dev defaults that are logged as a warning at startup. */
 @ConfigurationProperties(prefix = "exchange")
 public record ExchangeProperties(
+        String mode,              // lite | full
+        String kafkaBootstrap,
+        String clickhouseUrl,
+        String clickhouseUser,
+        String clickhousePassword,
+        String reportingUrl,
+        long reconcileLagMs,
         String pricing,           // first | gsp | ab
         long leaseChunkMicros,
         long leaseTtlMs,
@@ -23,6 +30,13 @@ public record ExchangeProperties(
         boolean pacingEnabled) {
 
     public ExchangeProperties {
+        if (mode == null || mode.isBlank()) mode = "lite";
+        if (kafkaBootstrap == null) kafkaBootstrap = "localhost:9092";
+        if (clickhouseUrl == null) clickhouseUrl = "http://localhost:8123";
+        if (clickhouseUser == null) clickhouseUser = "clearline";
+        if (clickhousePassword == null) clickhousePassword = "clearline-dev";
+        if (reportingUrl == null) reportingUrl = "http://localhost:8081";
+        if (reconcileLagMs <= 0) reconcileLagMs = 1_800_000L;
         if (pricing == null) pricing = "ab";
         if (leaseChunkMicros <= 0) leaseChunkMicros = 5_000_000;
         if (leaseTtlMs <= 0) leaseTtlMs = 60_000;

@@ -104,6 +104,19 @@ public final class InMemoryLeaseStore implements LeaseStore {
     }
 
     @Override
+    public long credit(String campaignId, long micros, long now) {
+        Campaign c = c(campaignId);
+        synchronized (c) {
+            reclaim(c, now);
+            long open = 0;
+            for (Rec r : c.open.values()) open += r.granted;
+            long amt = Math.min(micros, Math.max(0, c.committed - open));
+            c.committed -= amt;
+            return amt;
+        }
+    }
+
+    @Override
     public long available(String campaignId, long now) {
         Campaign c = c(campaignId);
         synchronized (c) {

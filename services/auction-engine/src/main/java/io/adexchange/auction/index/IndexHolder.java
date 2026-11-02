@@ -52,6 +52,15 @@ public final class IndexHolder {
         }
     }
 
+    /** Applies many changes with ONE snapshot rebuild (consumer catch-up, bulk loads). */
+    public synchronized void applyBatch(Collection<Campaign> upserts, Collection<String> removes) {
+        removes.forEach(all::remove);
+        upserts.forEach(c -> all.put(c.id(), c));
+        rebuild();
+        removes.forEach(onRemove);
+        upserts.forEach(onUpsert);
+    }
+
     public synchronized void replaceAll(Collection<Campaign> cs) {
         java.util.Set<String> keep = new java.util.HashSet<>();
         cs.forEach(c -> keep.add(c.id()));
