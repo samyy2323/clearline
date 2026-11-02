@@ -41,7 +41,7 @@ export default function Reports() {
         <Stat label="Billed spend" value={usd(s?.spendMicros ?? 0)} sub="de-duplicated impressions" />
       </div>
 
-      <Section title="Per-minute impressions and spend">
+      <Section title="Per-minute impressions and clicks">
         <LineChart
           x={t.map((p) => label(p.t))}
           series={[
