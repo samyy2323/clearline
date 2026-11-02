@@ -65,3 +65,20 @@ campaign's participation so budget is spread across its flight instead of burnin
 JWT (HS256, 8 h) with roles `admin` and `advertiser`; advertisers only see their own campaigns and reports (other tenants' ids
 return 404, not 403). Inputs are validated at the gateway and on campaign writes. Secrets come from environment variables
 (development defaults are logged as a warning). Tracking tokens are HMAC-signed with the event type in the MAC and an expiry.
+
+## Full edition: data flow and extra failure modes
+
+Write path: dashboard -> campaign API -> **Postgres** (campaign row + outbox row, one transaction) -> relay -> Kafka `campaign-events` (compacted, key = campaign id)
+-> every engine rebuilds its index from the topic (tombstone = delete). Event path: tracker -> `KafkaEventSink` (bounded queue) -> Kafka `ad-events` -> ClickHouse
+Kafka-engine table -> raw log + minute rollups + flag counts. Read path: dashboard -> app -> **reporting service** -> ClickHouse (JWT re-verified, tenant filter in SQL).
+Tracing: OpenTelemetry to Jaeger; one trace spans the app request, its outgoing call and the reporting service.
+
+| Failure | Behaviour | Where tested |
+|---|---|---|
+| Kafka down or slow | events buffered, then shed and counted; auctions unaffected; failed deliveries dead-lettered | `KafkaEventSinkTest` |
+| Kafka down at campaign write | outbox rows stay unpublished and are retried; no event lost | `PgOutboxKafkaIT` |
+| Postgres write fails | campaign row and outbox row roll back together | `PgOutboxKafkaIT` |
+| New engine instance | rebuilds the whole index from the compacted topic, no Postgres call | `PgOutboxKafkaIT` |
+| ClickHouse down | reporting returns 502 "analytics store unavailable"; reconciliation skips its run and credits nothing | `ReconcilerTest` |
+| Duplicate / fraud events | kept in the raw log with a flag, excluded from rollups, counted per minute | `ClickHouseRollupIT` |
+| Reporting query with hostile input | bound parameters and a column whitelist; 400 | `ClickHouseRollupIT`, live check |
