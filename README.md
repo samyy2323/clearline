@@ -153,6 +153,6 @@ Evidence in `bench/results/learning/`. The first attempt had AUC 0.50 (unlearnab
 
 ## Deploy
 
-**Lite, free:** `render.yaml` deploys the single image on Render's free plan (512 MB, sleeps when idle; the simulator drives itself so the
+**Step-by-step guide: [docs/HOSTING.md](docs/HOSTING.md).** **Lite, free:** `render.yaml` deploys the single image on Render's free plan (512 MB, sleeps when idle; the simulator drives itself so the
 dashboard is live). Koyeb and Fly.io work with the same `Dockerfile`. **Full:** needs roughly 4 cores and 6-8 GB; run `make up-full` on a VM
 (an Oracle Cloud Always Free ARM VM has fit this, subject to its current terms and availability) or apply the Kubernetes manifests.
