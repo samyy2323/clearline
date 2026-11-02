@@ -66,9 +66,14 @@ A campaign write and its change event are one Postgres transaction, so the event
 neither a row nor an event, that a delete travels as a Kafka tombstone, and that a brand-new engine rebuilds the identical index from the compacted topic without calling Postgres.
 Delivery is at-least-once, so the index apply is idempotent.
 
-## Does your reconciliation actually fix drift?
-Honest answer: it measures it and credits only what is provably unbillable, and in steady traffic that credit stays at zero (ADR 0009 has the numbers: 11-12% drift,
-0 credited). The conservative rule is safe and nearly inert; the exact fix is to key billed spend by booking time. I'd rather say that than claim it works.
+## Does your reconciliation actually fix drift, and how do you know it is exact?
+Yes, and I measured it against ground truth. Spend is booked at award time and billed only when a signed impression arrives, so about 11-12% of booked spend is never billed
+(unviewed impressions, bots). Every event carries `booked_ms`. A booking made at time P cannot be billed after P + tokenTtl, so for the snapshot taken a full token lifetime ago
+`credit = booked(P) - billedForBookingsUpTo(P + 2 s) - alreadyCredited` is exactly the unbillable spend, and Redis `credit.lua` returns it to the pool (never below open leases).
+On a live run the credit grew during steady traffic and, once traffic stopped and tokens expired, equalled booked minus billed to the micro (20,890,255; difference 0).
+I got it wrong first: the initial rule subtracted all bills so far, which is safe but credited nothing in steady traffic (ADR 0009 keeps that history). And my first ground-truth
+check showed a 1.0M gap that turned out to be my script comparing global totals, including 172 impressions on seed campaigns removed at startup.
+Limits: single engine (booked spend is an in-memory counter that resets on restart), and the correction lags by one token lifetime.
 
 ## Why ClickHouse and AggregatingMergeTree?
 Time-bucketed aggregates over a high-volume append-only stream. Materialized views write `sumState` partials per minute, queries use `sumMerge`, so results are right whether or not

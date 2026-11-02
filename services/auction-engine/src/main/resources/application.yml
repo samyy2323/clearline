@@ -60,7 +60,7 @@ exchange:
   clickhouse-user: ${CLICKHOUSE_USER:clearline}
   clickhouse-password: ${CLICKHOUSE_PASSWORD:clearline-dev}
   reporting-url: ${REPORTING_URL:http://localhost:8081}
-  reconcile-lag-ms: ${RECONCILE_LAG_MS:1800000}   # = tracking-token TTL: only bookings older than this can be judged "never billed"
+  token-ttl-ms: ${TOKEN_TTL_MS:1800000}   # tracking-token lifetime; the reconciler only judges bookings older than this
   pricing: ${PRICING:ab}                    # first | gsp | ab
   lease-chunk-micros: ${LEASE_CHUNK_MICROS:5000000}
   lease-ttl-ms: ${LEASE_TTL_MS:60000}

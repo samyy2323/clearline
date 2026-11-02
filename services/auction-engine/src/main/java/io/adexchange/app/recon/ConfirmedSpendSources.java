@@ -25,6 +25,10 @@ class ConfirmedSpendSources {
                 return m;
             }
 
+            public Map<String, Long> billedForBookingsUpTo(long tMs) {
+                return tracker.ledger().billedForBookingsUpTo(tMs);
+            }
+
             public String name() {
                 return "billing ledger (in memory)";
             }
@@ -45,6 +49,14 @@ class ConfirmedSpendSources {
             public Map<String, Long> billedByCampaign() {
                 Map<String, Long> m = new HashMap<>();
                 ch.query("SELECT campaign, sum(spend_micros) AS spend FROM clearline.ad_events WHERE type = 'imp' AND flag = '' GROUP BY campaign")
+                        .forEach(r -> m.put(r.get("campaign").asText(), ClickHouseClient.num(r, "spend")));
+                return m;
+            }
+
+            public Map<String, Long> billedForBookingsUpTo(long tMs) {
+                Map<String, Long> m = new HashMap<>();
+                ch.query("SELECT campaign, sum(spend_micros) AS spend FROM clearline.ad_events "
+                                + "WHERE type = 'imp' AND flag = '' AND booked_ms <= {t:UInt64} GROUP BY campaign", Map.of("t", Long.toString(tMs)))
                         .forEach(r -> m.put(r.get("campaign").asText(), ClickHouseClient.num(r, "spend")));
                 return m;
             }

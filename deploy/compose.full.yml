@@ -92,6 +92,7 @@ services:
       CLICKHOUSE_USER: clearline
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clearline-dev}
       REPORTING_URL: http://reporting:8081
+      TOKEN_TTL_MS: ${TOKEN_TTL_MS:-1800000}
       OTLP_TRACING_ENDPOINT: http://jaeger:4318/v1/traces
       TRACING_ENABLED: "true"
       TRACING_SAMPLE: ${TRACING_SAMPLE:-1.0}

@@ -11,7 +11,7 @@ public record ExchangeProperties(
         String clickhouseUser,
         String clickhousePassword,
         String reportingUrl,
-        long reconcileLagMs,
+        long tokenTtlMs,          // tracking-token lifetime; also the reconciler's lag (a booking older than this can never be billed)
         String pricing,           // first | gsp | ab
         long leaseChunkMicros,
         long leaseTtlMs,
@@ -36,7 +36,7 @@ public record ExchangeProperties(
         if (clickhouseUser == null) clickhouseUser = "clearline";
         if (clickhousePassword == null) clickhousePassword = "clearline-dev";
         if (reportingUrl == null) reportingUrl = "http://localhost:8081";
-        if (reconcileLagMs <= 0) reconcileLagMs = 1_800_000L;
+        if (tokenTtlMs <= 0) tokenTtlMs = 1_800_000L;
         if (pricing == null) pricing = "ab";
         if (leaseChunkMicros <= 0) leaseChunkMicros = 5_000_000;
         if (leaseTtlMs <= 0) leaseTtlMs = 60_000;

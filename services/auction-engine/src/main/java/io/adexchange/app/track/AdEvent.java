@@ -11,6 +11,7 @@ public record AdEvent(
         String type,
         String id,
         @JsonProperty("ts_ms") long tsMs,
+        @JsonProperty("booked_ms") long bookedMs,
         String campaign,
         String advertiser,
         String publisher,
@@ -25,8 +26,9 @@ public record AdEvent(
         double pctr,
         String flag) {
 
-    public static AdEvent of(String type, TrackingSigner.Ticket t, long spendMicros, String flag) {
-        return new AdEvent(type, t.eventId(), System.currentTimeMillis(), t.campaign(), t.advertiser(), t.pub(), t.geo(), t.dev(),
+    /** {@code booked_ms} = when the spend was booked at auction time (token expiry minus token lifetime); reconciliation groups bills by it. */
+    public static AdEvent of(String type, TrackingSigner.Ticket t, long spendMicros, String flag, long tokenTtlMs) {
+        return new AdEvent(type, t.eventId(), System.currentTimeMillis(), t.expMs() - tokenTtlMs, t.campaign(), t.advertiser(), t.pub(), t.geo(), t.dev(),
                 t.cat(), t.arm(), t.user(), t.hour(), t.priceCpmMicros(), spendMicros, t.pctr(), flag == null ? "" : flag);
     }
 }

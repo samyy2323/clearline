@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 class KafkaEventSinkTest {
 
     static AdEvent event(String id) {
-        return new AdEvent("imp", id, 1_700_000_000_000L, "c1", "adv-1", "pub1", "IN", "mobile", "news", "gsp", "u1", 14, 4_000_000, 4_000, 0.02, "");
+        return new AdEvent("imp", id, 1_700_000_000_000L, 1_699_999_000_000L, "c1", "adv-1", "pub1", "IN", "mobile", "news", "gsp", "u1", 14, 4_000_000, 4_000, 0.02, "");
     }
 
     static void await(java.util.function.BooleanSupplier c) throws InterruptedException {

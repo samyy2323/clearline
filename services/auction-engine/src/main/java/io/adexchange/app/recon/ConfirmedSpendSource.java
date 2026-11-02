@@ -7,5 +7,8 @@ public interface ConfirmedSpendSource {
 
     Map<String, Long> billedByCampaign();
 
+    /** Billed spend per campaign for bookings made at or before {@code tMs} (booking time, not billing time). */
+    Map<String, Long> billedForBookingsUpTo(long tMs);
+
     String name();
 }

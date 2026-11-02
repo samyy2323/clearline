@@ -29,6 +29,7 @@ public class TrackerService {
     private final EventStats stats;
     private final EventLog eventLog;
     private final AdEventSink sink;
+    private final long tokenTtlMs;
 
     private final Map<String, AtomicInteger> userClicks = new ConcurrentHashMap<>();
     private final Map<String, AtomicInteger> ipClicks = new ConcurrentHashMap<>();
@@ -39,11 +40,12 @@ public class TrackerService {
         this.stats = stats;
         this.eventLog = eventLog;
         this.sink = sink;
+        this.tokenTtlMs = props.tokenTtlMs();
     }
 
     private void emit(String type, TrackingSigner.Ticket t, long spend, String flag) {
         try {
-            sink.publish(AdEvent.of(type, t, spend, flag));
+            sink.publish(AdEvent.of(type, t, spend, flag, tokenTtlMs));
         } catch (RuntimeException e) {
             // the sink must never break tracking; it counts its own failures
         }
@@ -111,7 +113,7 @@ public class TrackerService {
             }
             case "imp" -> {
                 long amount = Math.max(1, t.priceCpmMicros() / 1000);
-                if (!ledger.billImpression(id, t.campaign(), t.arm(), amount)) {
+                if (!ledger.billImpression(id, t.campaign(), t.arm(), amount, t.expMs() - tokenTtlMs)) {
                     stats.flag(type, "DUPLICATE", t.campaign(), ip);
                 emit(type, t, 0, "DUPLICATE");
                     return Outcome.DUPLICATE;

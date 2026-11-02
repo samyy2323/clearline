@@ -32,13 +32,12 @@ public class BidGateway {
         }
     }
 
-    private static final long TOKEN_TTL_MS = 30 * 60_000L;
-
     private final AuctionEngine engine;
     private final TrackerService tracker;
     private final EventStats stats;
     private final ScalableClock clock;
     private final int maxInFlight;
+    private final long tokenTtlMs;
     private final AtomicInteger inFlight = new AtomicInteger();
 
     public final LongAdder shed = new LongAdder();
@@ -53,6 +52,7 @@ public class BidGateway {
         this.stats = stats;
         this.clock = clock;
         this.maxInFlight = props.maxInFlight();
+        this.tokenTtlMs = props.tokenTtlMs();
     }
 
     public int inFlight() {
@@ -72,7 +72,7 @@ public class BidGateway {
             if (r.isNoBid()) return new Result(r.requestId(), List.of(), r.noBidReason(), r.degraded(), r.pricingArm());
             int hour = clock.hourOfDay();
             String segs = String.join(",", req.segments());
-            long exp = System.currentTimeMillis() + TOKEN_TTL_MS;
+            long exp = System.currentTimeMillis() + tokenTtlMs;
             List<Offer> offers = new ArrayList<>(r.bids().size());
             for (BidResponse.Bid b : r.bids()) {
                 var t = new TrackingSigner.Ticket(req.id(), b.slotId(), b.campaignId(), b.advertiserId(), b.priceCpmMicros(),

@@ -10,4 +10,4 @@
 - [x] Deploy packaging: Dockerfile, compose (+lite), Prometheus, Grafana, render.yaml, Makefile
 - [x] Chaos run (before/after circuit breaker), config experiments, optimization notes, README
 - [x] Full edition: Postgres outbox, Kafka (campaign feed + events, DLQ, shedding), ClickHouse rollups, reporting service, reconciler, tracing, k8s manifests, integration tests
-- [ ] Not done: Protobuf/schema registry, WebFlux, Toxiproxy, Bloom tier, exact reconciliation credit, live k8s test, quiet-machine latency re-run of the profile fixes, a real deployment
+- [ ] Not done: Protobuf/schema registry, WebFlux, Toxiproxy, Bloom tier, live k8s test, quiet-machine latency re-run of the profile fixes, a real deployment

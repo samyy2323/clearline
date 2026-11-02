@@ -42,7 +42,7 @@ Set `ADMIN_PASSWORD`, `ADVERTISER_PASSWORD`, `JWT_SECRET`, `HMAC_SECRET` for any
   revenue per arm; per-stage deadlines that turn a slow stage into a no-bid, never a late bid.
 - **Budget control.** Lease-based spend: atomic Lua scripts, lock-free local spend, async renew/settle, graceful release, expiry reclaim
   with late-spend tombstones; jqwik-tested overspend bound. PID-style pacing with an injectable clock. **Reconciliation** compares booked
-  spend with ClickHouse-confirmed spend, emits a drift metric and credits back only spend that can no longer be billed ([ADR 0009](docs/adr/0009-reconciliation-and-credit.md)).
+  spend with ClickHouse-confirmed spend, emits a drift metric and **exactly** credits back spend that can no longer be billed, using the booking time carried in every event ([ADR 0009](docs/adr/0009-reconciliation-and-credit.md)).
 - **Frequency caps.** Sliding window of time buckets; a Redis batch lookup is one Lua call; fails open and is guarded by a Resilience4j
   circuit breaker that also trips on slow calls.
 - **Events (full).** Signed, expiring win/impression/click URLs; dedupe; fraud flags (bots, click-without-impression, floods, duplicates)
@@ -120,7 +120,7 @@ Evidence in `bench/results/learning/`. The first attempt had AUC 0.50 (unlearnab
 
 ## What was verified
 
-- `make test`: 48 tests, green on a full run across all modules: unit, jqwik property and Testcontainers tests, including **Postgres + Kafka** (atomic outbox rollback, tombstones, replay from
+- `make test`: 50 tests, green on a full run across all modules: unit, jqwik property and Testcontainers tests, including **Postgres + Kafka** (atomic outbox rollback, tombstones, replay from
   the compacted topic), a **ClickHouse** rollup test running the real DDL, Redis Lua scripts, the Kafka sink (delivery, DLQ, shedding, dead broker),
   reconciliation, and Java/Python hashing parity.
 - **Full stack as containers (`deploy/compose.full.yml`):** app, reporting, Kafka, Postgres, ClickHouse, Redis, Jaeger, Prometheus and Grafana all ran healthy.
@@ -128,16 +128,20 @@ Evidence in `bench/results/learning/`. The first attempt had AUC 0.50 (unlearnab
   **identical: 31,132,473 micros over 9,802 impressions**, with 0 events dropped, lost or dead-lettered. (An earlier run with the app on the host against containerized
   infrastructure also reconciled; the only difference there was two events I injected by hand.)
 - **One distributed trace across two services** in Jaeger: the app's request span (216 ms), its outgoing call (188 ms) and the reporting service's span (162 ms) share a trace id.
-- **Reconciler on a clean run:** drift grew from 3.3M to 16.8M micros over 274 s (about 11-12% of booked spend: impressions never viewed plus bot traffic) and **nothing was
-  credited back** in that window. The safe rule only credits once billing for old bookings has stalled; see [ADR 0009](docs/adr/0009-reconciliation-and-credit.md) for why and the fix that was not built.
+- **Exact reconciliation, checked against ground truth** (`bench/reconcile-check.sh`, 60 s token lifetime, 300 req/s, real Kafka + ClickHouse + Redis):
+  the credit tracks the never-billable spend while traffic is still running (1.8M micros after 2 min, 16.2M after 6 min; the previous rule credited 0), and after
+  traffic stopped and tokens expired, **credited = booked - billed = 20,890,255 micros, difference 0**, with no campaign billed above its booked amount.
+  About 11-12% of booked spend is never billed (impressions never viewed, bot traffic). A first version of my check reported a 1.0M gap; it was my script comparing global
+  totals, and the gap was exactly the billing of 172 impressions on seed campaigns that were removed at startup (ClickHouse shows 1,016,384 micros under them).
 - Reporting API: an advertiser sees only their own rows (Nike 1,240 of 13,857 impressions in one check), flags are admin-only, and injection attempts return 400.
 - The lite image builds and ran under a 512 MB limit at about 184 MiB.
 - Kubernetes manifests render with kustomize (19 resources). **They were not applied to a live cluster** (no cluster was available), so the HPA demo is untested.
 
 ## Known limitations and what is not built
 
+- Reconciliation reads booked spend from one engine's in-memory counter (resets on restart; one engine only), not yet from the Redis ledger.
 - Protobuf and a schema registry (JSON is used), a WebFlux gateway, Toxiproxy network chaos, a Bloom/count-min frequency tier, exactly-once delivery
-  to ClickHouse, multi-engine reconciliation, the stretch items (replay, bid shading). See [ADR 0006](docs/adr/0006-lite-mode-and-scope.md).
+  to ClickHouse, the stretch items (replay, bid shading). See [ADR 0006](docs/adr/0006-lite-mode-and-scope.md).
 - JFR profiling was done and three fixes made, but their latency effect is unmeasured (see above).
 - With $5 leases a popular campaign can drain a lease faster than the 500 ms renewal tick at 5,000 req/s (377,633 denied spends in the baseline); no-bid stayed 0%,
   but that campaign loses fill. Size chunks from observed spend rate, or renew faster.

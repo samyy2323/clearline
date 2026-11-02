@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS clearline.ad_events_queue
     type               LowCardinality(String),
     id                 String,
     ts_ms              UInt64,
+    booked_ms          UInt64,
     campaign           String,
     advertiser         String,
     publisher          String,
@@ -36,6 +37,7 @@ CREATE TABLE IF NOT EXISTS clearline.ad_events
     type               LowCardinality(String),
     id                 String,
     ts                 DateTime,
+    booked_ms          UInt64,
     campaign           String,
     advertiser         String,
     publisher          String,
@@ -56,7 +58,7 @@ ORDER BY (campaign, ts)
 TTL ts + INTERVAL 30 DAY;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS clearline.ad_events_mv TO clearline.ad_events AS
-SELECT type, id, toDateTime(intDiv(ts_ms, 1000)) AS ts, campaign, advertiser, publisher, geo, device, category, arm, user, hour,
+SELECT type, id, toDateTime(intDiv(ts_ms, 1000)) AS ts, booked_ms, campaign, advertiser, publisher, geo, device, category, arm, user, hour,
        price_cpm_micros, spend_micros, pctr, flag
 FROM clearline.ad_events_queue;
 

@@ -1,0 +1,28 @@
+== traffic running (token lifetime 60000 ms) ==
+t=  61s booked=   42500137 billed=   38260658 drift=   4219046 unbillable=         0 credited=         0 runs=1 err=''
+t= 121s booked=   73427495 billed=   65426046 drift=   7393745 unbillable=   1846785 credited=   1846785 runs=2 err=''
+t= 182s booked=   99776707 billed=   88597266 drift=  13102226 unbillable=   6385435 credited=   6385435 runs=3 err=''
+t= 242s booked=  124589631 billed=  110368000 drift=  15565724 unbillable=   9820783 credited=   9820783 runs=4 err=''
+t= 302s booked=  147585984 billed=  130476390 drift=  17982185 unbillable=  13064702 credited=  13064702 runs=5 err=''
+t= 363s booked=  170261462 billed=  150478732 drift=  20003896 unbillable=  16165198 credited=  16165198 runs=6 err=''
+== traffic stopped; waiting for tokens to expire and two reconcile runs ==
+t= 424s booked=  170855335 billed=  150981464 drift=  20890255 unbillable=  18595265 credited=  18595265 runs=7 err=''
+t= 484s booked=  170855335 billed=  150981464 drift=  20890255 unbillable=  20890255 credited=  20890255 runs=8 err=''
+t= 544s booked=  170855335 billed=  150981464 drift=  20890255 unbillable=  20890255 credited=  20890255 runs=9 err=''
+t= 605s booked=  170855335 billed=  150981464 drift=  20890255 unbillable=  20890255 credited=  20890255 runs=10 err=''
+== ground truth ==
+booked (lease spend)      : 170855335
+billed (app ledger)       : 150981464 | billed in ClickHouse: 150981464
+booked - billed           : 19873871
+credited by the reconciler: 20890255
+difference                : -1016384
+
+== corrected ground truth (live campaigns; the first version of this script compared global totals) ==
+booked (lease spend)      : 170855335
+billed (app ledger)       : 149965080
+booked - billed           : 20890255
+credited by the reconciler: 20890255
+difference                : 0 (0 = exact)
+campaigns with billed > booked: 0
+explanation of the earlier -1,016,384: 172 impressions billed on the seed campaigns (c0-*), which served for a few seconds at startup
+before the simulator reseeded and removed them; ClickHouse holds exactly 1,016,384 micros under c0. Removed campaigns are not reconciled.

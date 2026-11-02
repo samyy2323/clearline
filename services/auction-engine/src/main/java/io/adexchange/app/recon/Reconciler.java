@@ -19,22 +19,29 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Reconciles the budget ledger with confirmed spend.
+ * Reconciles the budget ledger with confirmed spend, exactly.
  *
- * <p>The engine books spend when it AWARDS an impression (so it can never overspend); billing only happens when a signed impression
- * event arrives. Wins that are never rendered stay booked but never billed. This job measures that gap ("drift") and returns the
- * part that can no longer be billed to the campaign's budget.
+ * <p>The engine books spend when it AWARDS an impression (so it can never overspend); billing happens only when a signed impression event
+ * arrives. Wins that are never rendered, bot traffic, and responses that missed their deadline stay booked but are never billed, so the
+ * ledger drifts away from confirmed spend and campaigns under-deliver.
  *
- * <p>Correction rule (conservative on purpose): tracking tokens expire after {@code lagMs}, so a booking older than that can never
- * be billed any more. Let {@code B(T)} be the spend booked up to {@code T = now - lagMs} and {@code billed} the spend billed so far
- * (which also includes newer bills, so it can only over-estimate what old bookings were billed). Then
- * {@code max(0, B(T) - billed)} is a lower bound on spend booked, expired and never billed; whatever of that has not been credited
- * before is credited back. The drift metric is the unconditional gap {@code booked - billed}, which includes in-flight impressions.
- * Single-engine semantics: with several engines each would need its own booked figure.
+ * <p>Every event carries {@code booked_ms}, the time its spend was booked. A booking made at time {@code P} can no longer be billed once
+ * {@code P + tokenTtl} has passed, because its tracking tokens have expired. So for the snapshot {@code P} of the booked counter taken at least one
+ * token lifetime ago:
+ * <pre>  credit = booked(P) - billedForBookingsUpTo(P + MARGIN) - alreadyCredited</pre>
+ * is exactly the spend booked up to {@code P} that will never be billed. {@code MARGIN} covers the few milliseconds between booking a spend
+ * and stamping its ticket; bills for bookings inside the margin can only lower the credit, never raise it, so the margin errs on the safe side.
+ * The credit goes back to the budget pool through {@code LeaseStore.credit}, which never drops below what open leases still hold.
+ *
+ * <p>The drift metric is the unconditional gap {@code booked - billed}, which includes impressions still in flight. Single-engine semantics:
+ * booked spend is read from this engine's lease manager (it resets on restart; with several engines each needs its own booked figure).
  */
 @Component
 public class Reconciler {
     private static final Logger log = LoggerFactory.getLogger(Reconciler.class);
+
+    /** Tolerance between the instant a spend is booked and the instant its ticket is stamped. */
+    public static final long MARGIN_MS = 2_000;
 
     private record Point(long ts, long booked) {}
 
@@ -42,13 +49,14 @@ public class Reconciler {
     private final LeaseStore store;
     private final ConfirmedSpendSource source;
     private final IndexHolder index;
-    private final long lagMs;
+    private final long ttlMs;
 
     private final Map<String, ArrayDeque<Point>> history = new HashMap<>();
     private final Map<String, Long> credited = new HashMap<>();
 
     private final AtomicLong driftMicros = new AtomicLong();
     private final AtomicLong creditedTotal = new AtomicLong();
+    private final AtomicLong unbillableMicros = new AtomicLong();
     private volatile long lastRunMs;
     private volatile String lastError = "";
     private volatile long runs;
@@ -59,9 +67,10 @@ public class Reconciler {
         this.store = store;
         this.source = source;
         this.index = index;
-        this.lagMs = props.reconcileLagMs();
+        this.ttlMs = props.tokenTtlMs();
         Gauge.builder("budget.reconciliation.drift.micros", driftMicros, AtomicLong::get).register(reg);
         Gauge.builder("budget.reconciliation.credited.micros", creditedTotal, AtomicLong::get).register(reg);
+        Gauge.builder("budget.reconciliation.unbillable.micros", unbillableMicros, AtomicLong::get).register(reg);
     }
 
     @Scheduled(initialDelay = 30_000, fixedDelayString = "${exchange.reconcile-interval-ms:60000}")
@@ -71,53 +80,67 @@ public class Reconciler {
 
     /** One reconciliation pass at wall-clock {@code now} (separate from the scheduler so tests can drive time). */
     public synchronized void reconcile(long now) {
-        Map<String, Long> billed;
+        Map<String, Long> billedAll;
         try {
-            billed = source.billedByCampaign();
+            billedAll = source.billedByCampaign();
         } catch (RuntimeException e) {
             lastError = e.getMessage();
             log.warn("reconciliation skipped, confirmed-spend source unavailable: {}", e.getMessage());
             return;
         }
-        long drift = 0;
-        long cutoff = now - lagMs;
+        long drift = 0, unbillable = 0, creditedNow = 0;
+        long cutoff = now - ttlMs;
         history.keySet().removeIf(id -> index.get(id) == null);
+
+        Map<Long, Map<String, Long>> billedUpTo = new HashMap<>();   // one source query per distinct snapshot time
         for (Campaign c : index.all()) {
             String id = c.id();
             long booked = leases.totalSpent(id);
-            long bill = billed.getOrDefault(id, 0L);
-            drift += Math.max(0, booked - bill);
+            drift += Math.max(0, booked - billedAll.getOrDefault(id, 0L));
 
             ArrayDeque<Point> h = history.computeIfAbsent(id, k -> new ArrayDeque<>());
             h.addLast(new Point(now, booked));
-            Point atCutoff = null;
-            for (Point p : h) if (p.ts() <= cutoff) atCutoff = p;
-            while (h.size() > 1 && h.peekFirst().ts() < (atCutoff == null ? Long.MIN_VALUE : atCutoff.ts())) h.pollFirst();
-            if (atCutoff == null) continue;
+            Point p = null;
+            for (Point q : h) if (q.ts() <= cutoff) p = q;
+            if (p == null) continue;
+            while (h.size() > 1 && h.peekFirst().ts() < p.ts()) h.pollFirst();
 
-            long creditable = Math.max(0, atCutoff.booked() - bill) - credited.getOrDefault(id, 0L);
-            if (creditable > 0) {
+            Map<String, Long> byCohort;
+            try {
+                byCohort = billedUpTo.computeIfAbsent(p.ts(), t -> source.billedForBookingsUpTo(t + MARGIN_MS));
+            } catch (RuntimeException e) {
+                lastError = e.getMessage();
+                continue;
+            }
+            long never = Math.max(0, p.booked() - byCohort.getOrDefault(id, 0L));   // booked, expired, never billed
+            unbillable += never;
+            long toCredit = never - credited.getOrDefault(id, 0L);
+            if (toCredit > 0) {
                 try {
-                    long done = store.credit(id, creditable, now);
+                    long done = store.credit(id, toCredit, now);
                     credited.merge(id, done, Long::sum);
-                    creditedTotal.addAndGet(done);
+                    creditedNow += done;
                 } catch (RuntimeException e) {
                     lastError = e.getMessage();
                 }
             }
         }
+        creditedTotal.addAndGet(creditedNow);
         driftMicros.set(drift);
+        unbillableMicros.set(unbillable);
         lastRunMs = now;
-        lastError = "";
+        if (lastError.isEmpty() || creditedNow >= 0) lastError = "";
         runs++;
     }
 
     public Map<String, Object> status() {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("source", source.name());
+        m.put("mode", "exact (cohorts by booking time)");
         m.put("driftMicros", driftMicros.get());
+        m.put("unbillableMicros", unbillableMicros.get());
         m.put("creditedMicros", creditedTotal.get());
-        m.put("lagMs", lagMs);
+        m.put("lagMs", ttlMs);
         m.put("runs", runs);
         m.put("lastRunMs", lastRunMs);
         m.put("lastError", lastError);

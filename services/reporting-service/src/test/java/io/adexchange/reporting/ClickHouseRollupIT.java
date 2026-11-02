@@ -45,9 +45,9 @@ class ClickHouseRollupIT {
     }
 
     static String ev(String type, String id, long tsMs, String campaign, String adv, String geo, long spend, String flag) {
-        return String.format("{\"type\":\"%s\",\"id\":\"%s\",\"ts_ms\":%d,\"campaign\":\"%s\",\"advertiser\":\"%s\",\"publisher\":\"pub1\","
+        return String.format("{\"type\":\"%s\",\"id\":\"%s\",\"ts_ms\":%d,\"booked_ms\":%d,\"campaign\":\"%s\",\"advertiser\":\"%s\",\"publisher\":\"pub1\","
                 + "\"geo\":\"%s\",\"device\":\"mobile\",\"category\":\"news\",\"arm\":\"gsp\",\"user\":\"u\",\"hour\":14,"
-                + "\"price_cpm_micros\":4000000,\"spend_micros\":%d,\"pctr\":0.02,\"flag\":\"%s\"}", type, id, tsMs, campaign, adv, geo, spend, flag);
+                + "\"price_cpm_micros\":4000000,\"spend_micros\":%d,\"pctr\":0.02,\"flag\":\"%s\"}", type, id, tsMs, tsMs, campaign, adv, geo, spend, flag);
     }
 
     static void insert(String... events) {
@@ -117,5 +117,21 @@ class ClickHouseRollupIT {
         assertThat(ClickHouseClient.num(evil, "spend")).isZero();
         assertThatThrownBy(() -> client.query("SELECT * FROM table_that_does_not_exist"))
                 .isInstanceOf(ClickHouseClient.ClickHouseException.class);
+    }
+
+    @Test
+    void billedSpendCanBeTotalledByBookingTimeNotBillingTime() {
+        // booked 10 min ago and billed just now vs booked just now: the cohort query must split them by BOOKING time
+        long booked = MIN + 1_000, billedAt = MIN + 600_000;
+        insert(String.format("{\"type\":\"imp\",\"id\":\"k1\",\"ts_ms\":%d,\"booked_ms\":%d,\"campaign\":\"c5\",\"advertiser\":\"adv-5\","
+                        + "\"publisher\":\"p\",\"geo\":\"IN\",\"device\":\"mobile\",\"category\":\"news\",\"arm\":\"gsp\",\"user\":\"u\",\"hour\":1,"
+                        + "\"price_cpm_micros\":1,\"spend_micros\":3000,\"pctr\":0.01,\"flag\":\"\"}", billedAt, booked),
+                String.format("{\"type\":\"imp\",\"id\":\"k2\",\"ts_ms\":%d,\"booked_ms\":%d,\"campaign\":\"c5\",\"advertiser\":\"adv-5\","
+                        + "\"publisher\":\"p\",\"geo\":\"IN\",\"device\":\"mobile\",\"category\":\"news\",\"arm\":\"gsp\",\"user\":\"u\",\"hour\":1,"
+                        + "\"price_cpm_micros\":1,\"spend_micros\":5000,\"pctr\":0.01,\"flag\":\"\"}", billedAt + 1_000, billedAt));
+        String q = "SELECT sum(spend_micros) AS spend FROM clearline.ad_events WHERE campaign = {c:String} AND type = 'imp' AND flag = '' AND booked_ms <= {t:UInt64}";
+        assertThat(ClickHouseClient.num(one(q, Map.of("c", "c5", "t", Long.toString(booked + 2_000))), "spend"))
+                .as("only the early booking, although both were billed after the cutoff").isEqualTo(3_000);
+        assertThat(ClickHouseClient.num(one(q, Map.of("c", "c5", "t", Long.toString(billedAt))), "spend")).isEqualTo(8_000);
     }
 }

@@ -12,38 +12,56 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ReconcilerTest {
-    static final long LAG = 10_000;
+    static final long TTL = 10_000;
+    static final long T0 = 1_000_000;
 
-    ManualClock clock = new ManualClock(1_000_000);
+    ManualClock clock = new ManualClock(T0);
     InMemoryLeaseStore store = new InMemoryLeaseStore();
     LeaseManager leases = new LeaseManager(store, clock, "eng", 100_000, 3_600_000, 1_000, 0.4);
     IndexHolder index = new IndexHolder();
-    Map<String, Long> billed = new HashMap<>();
+    /** every bill the "analytics store" has received: {bookedMs, micros} */
+    List<long[]> bills = new ArrayList<>();
+    boolean sourceDown;
     Reconciler recon;
+
+    ConfirmedSpendSource source = new ConfirmedSpendSource() {
+        public Map<String, Long> billedByCampaign() {
+            if (sourceDown) throw new IllegalStateException("clickhouse down");
+            return Map.of("c", bills.stream().mapToLong(b -> b[1]).sum());
+        }
+
+        public Map<String, Long> billedForBookingsUpTo(long tMs) {
+            if (sourceDown) throw new IllegalStateException("clickhouse down");
+            return Map.of("c", bills.stream().filter(b -> b[0] <= tMs).mapToLong(b -> b[1]).sum());
+        }
+
+        public String name() { return "test"; }
+    };
+
+    static ExchangeProperties props() {
+        return new ExchangeProperties("lite", null, null, null, null, null, TTL, null, 0, 0, null, null, null, null, null,
+                0, 0, null, null, false, 1, 0, false);
+    }
 
     @BeforeEach
     void setUp() {
-        ConfirmedSpendSource src = new ConfirmedSpendSource() {
-            public Map<String, Long> billedByCampaign() { return new HashMap<>(billed); }
-            public String name() { return "test"; }
-        };
-        ExchangeProperties props = new ExchangeProperties("lite", null, null, null, null, null, LAG, null, 0, 0, null, null, null, null, null,
-                0, 0, null, null, false, 1, 0, false);
-        recon = new Reconciler(leases, store, src, index, props, new SimpleMeterRegistry());
+        recon = new Reconciler(leases, store, source, index, props(), new SimpleMeterRegistry());
         store.registerBudget("c", 1_000_000);
         index.upsert(new Campaign("c", "adv-1", "n", 5_000_000, 1_000_000, Set.of(), Set.of(), Set.of(), Set.of(), 0, Set.of(), 0, 0, Long.MAX_VALUE, true));
         leases.activate("c");
     }
 
-    /** Spends through several leases so that part of the spend lives in CLOSED leases (credit never touches open leases). */
-    long bookSpend(long total) {
+    /** Books {@code total} micros through several leases (credit only ever touches CLOSED leases) and bills {@code billed} of it at the booking time. */
+    void book(long total, long billed) {
         long spent = 0;
         while (spent < total) {
             if (leases.trySpend("c", 10_000)) spent += 10_000;
@@ -51,62 +69,71 @@ class ReconcilerTest {
         }
         leases.tick();
         leases.tick();
-        return spent;
+        if (billed > 0) bills.add(new long[]{clock.nowMillis(), billed});
     }
 
     @Test
-    void driftIsTheGapBetweenBookedAndBilledAndNothingIsCreditedInsideTheTokenLifetime() {
-        long booked = bookSpend(300_000);
-        billed.put("c", 200_000L);
+    void creditIsExactEvenWhileNewerBookingsKeepBeingBilled() {
+        book(300_000, 200_000);                         // 100k booked at T0 will never be billed
         recon.reconcile(clock.nowMillis());
-        assertThat(recon.status().get("driftMicros")).isEqualTo(booked - 200_000);
-        clock.advance(LAG / 2);
+        clock.advance(6_000);
+        book(100_000, 100_000);                         // steady traffic: the newer booking is fully billed
+        recon.reconcile(clock.nowMillis());
+        clock.advance(TTL - 6_000 + 1);                 // T0's tokens have all expired; the newer booking's have not
+
         long committedBefore = store.committed("c", clock.nowMillis());
         recon.reconcile(clock.nowMillis());
-        assertThat(recon.status().get("creditedMicros")).as("too early: unbilled impressions may still arrive").isEqualTo(0L);
+
+        assertThat(recon.status().get("creditedMicros")).as("exactly the booked-and-never-billed 100k").isEqualTo(100_000L);
+        assertThat(store.committed("c", clock.nowMillis())).isEqualTo(committedBefore - 100_000);
+    }
+
+    @Test
+    void nothingIsCreditedInsideTheTokenLifetime() {
+        book(300_000, 200_000);
+        recon.reconcile(clock.nowMillis());
+        clock.advance(TTL / 2);
+        long committedBefore = store.committed("c", clock.nowMillis());
+        recon.reconcile(clock.nowMillis());
+        assertThat(recon.status().get("creditedMicros")).as("unbilled impressions may still arrive").isEqualTo(0L);
         assertThat(store.committed("c", clock.nowMillis())).isEqualTo(committedBefore);
+        assertThat((long) recon.status().get("driftMicros")).as("drift is reported regardless").isEqualTo(100_000L);
     }
 
     @Test
-    void bookingsOlderThanTheTokenLifetimeThatWereNeverBilledAreCreditedBackOnce() {
-        long booked = bookSpend(300_000);
-        billed.put("c", 200_000L);
-        recon.reconcile(clock.nowMillis());                    // records booked spend at t0
-        clock.advance(LAG + 1);
-        long committedBefore = store.committed("c", clock.nowMillis());
+    void creditIsAppliedOnceAndIsIdempotent() {
+        book(300_000, 200_000);
         recon.reconcile(clock.nowMillis());
-        long credited = (long) recon.status().get("creditedMicros");
-        assertThat(credited).as("never more than booked-and-expired minus billed").isBetween(1L, booked - 200_000);
-        assertThat(store.committed("c", clock.nowMillis())).isEqualTo(committedBefore - credited);
-        recon.reconcile(clock.nowMillis() + 1);
-        assertThat(recon.status().get("creditedMicros")).as("idempotent: the same drift is not credited twice").isEqualTo(credited);
+        clock.advance(TTL + 1);
+        recon.reconcile(clock.nowMillis());
+        long first = (long) recon.status().get("creditedMicros");
+        recon.reconcile(clock.nowMillis() + 1_000);
+        recon.reconcile(clock.nowMillis() + 2_000);
+        assertThat(first).isEqualTo(100_000L);
+        assertThat(recon.status().get("creditedMicros")).isEqualTo(first);
     }
 
     @Test
-    void whenBillingCatchesUpNothingIsCredited() {
-        bookSpend(300_000);
-        billed.put("c", leases.totalSpent("c"));
+    void whenEverythingBookedWasBilledNothingIsCredited() {
+        book(300_000, 300_000);
         recon.reconcile(clock.nowMillis());
-        clock.advance(LAG + 1);
+        clock.advance(TTL + 1);
         recon.reconcile(clock.nowMillis());
         assertThat(recon.status().get("creditedMicros")).isEqualTo(0L);
         assertThat(recon.status().get("driftMicros")).isEqualTo(0L);
     }
 
     @Test
-    void anUnavailableConfirmedSpendSourceSkipsTheRunInsteadOfCreditingOnBadData() {
-        bookSpend(200_000);
-        ConfirmedSpendSource broken = new ConfirmedSpendSource() {
-            public Map<String, Long> billedByCampaign() { throw new IllegalStateException("clickhouse down"); }
-            public String name() { return "broken"; }
-        };
-        ExchangeProperties props = new ExchangeProperties("lite", null, null, null, null, null, LAG, null, 0, 0, null, null, null, null, null,
-                0, 0, null, null, false, 1, 0, false);
-        Reconciler r = new Reconciler(leases, store, broken, index, props, new SimpleMeterRegistry());
-        r.reconcile(clock.nowMillis());
-        clock.advance(LAG + 1);
-        r.reconcile(clock.nowMillis());
-        assertThat(r.status().get("creditedMicros")).isEqualTo(0L);
-        assertThat((String) r.status().get("lastError")).contains("clickhouse down");
+    void anUnavailableSourceSkipsTheRunInsteadOfCreditingOnBadData() {
+        book(300_000, 200_000);
+        recon.reconcile(clock.nowMillis());
+        clock.advance(TTL + 1);
+        sourceDown = true;
+        recon.reconcile(clock.nowMillis());
+        assertThat(recon.status().get("creditedMicros")).isEqualTo(0L);
+        assertThat((String) recon.status().get("lastError")).contains("clickhouse down");
+        sourceDown = false;
+        recon.reconcile(clock.nowMillis() + 1);
+        assertThat(recon.status().get("creditedMicros")).as("recovers on the next run").isEqualTo(100_000L);
     }
 }
