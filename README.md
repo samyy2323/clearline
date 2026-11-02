@@ -123,7 +123,7 @@ Evidence in `bench/results/learning/`. The first attempt had AUC 0.50 (unlearnab
 
 ## What was verified
 
-- `make test`:  tests, green on a full run across all modules: unit, jqwik property and Testcontainers tests, including **Postgres + Kafka** (atomic outbox rollback, tombstones, replay from
+- `make test`: 56 tests, green on a full run across all modules: unit, jqwik property and Testcontainers tests, including **Postgres + Kafka** (atomic outbox rollback, tombstones, replay from
   the compacted topic), a **ClickHouse** rollup test running the real DDL, Redis Lua scripts, the Kafka sink (delivery, DLQ, shedding, dead broker),
   reconciliation, and Java/Python hashing parity.
 - **Full stack as containers (`deploy/compose.full.yml`):** app, reporting, Kafka, Postgres, ClickHouse, Redis, Jaeger, Prometheus and Grafana all ran healthy.
