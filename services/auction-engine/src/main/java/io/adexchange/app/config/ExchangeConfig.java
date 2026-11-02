@@ -27,6 +27,13 @@ import java.util.UUID;
 public class ExchangeConfig {
     private static final Logger log = LoggerFactory.getLogger(ExchangeConfig.class);
 
+    /** Jackson's default thread-local buffer pool is useless under virtual threads (fresh 8-16 KB buffers per request). */
+    @Bean
+    org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer jacksonRecyclerPool() {
+        return b -> b.factory(com.fasterxml.jackson.core.JsonFactory.builder()
+                .recyclerPool(com.fasterxml.jackson.core.util.JsonRecyclerPools.sharedLockFreePool()).build());
+    }
+
     @Bean
     ScalableClock simClock() {
         return new ScalableClock();

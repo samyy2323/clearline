@@ -32,9 +32,19 @@ public final class TrackingSigner {
     private static final Base64.Encoder ENC = Base64.getUrlEncoder().withoutPadding();
     private static final Base64.Decoder DEC = Base64.getUrlDecoder();
     private final byte[] key;
+    // Mac.getInstance + init per call was ~19% of allocation; a ThreadLocal would not help (virtual threads), so pool instances
+    private final java.util.concurrent.ConcurrentLinkedQueue<Mac> pool = new java.util.concurrent.ConcurrentLinkedQueue<>();
 
     public TrackingSigner(String secret) {
         this.key = secret.getBytes(StandardCharsets.UTF_8);
+    }
+
+    private Mac borrow() throws Exception {
+        Mac m = pool.poll();
+        if (m != null) return m;
+        m = Mac.getInstance("HmacSHA256");
+        m.init(new SecretKeySpec(key, "HmacSHA256"));
+        return m;
     }
 
     private static String clean(String s) {
@@ -42,24 +52,36 @@ public final class TrackingSigner {
     }
 
     private String mac(String type, String data) {
+        Mac m = null;
         try {
-            Mac m = Mac.getInstance("HmacSHA256");
-            m.init(new SecretKeySpec(key, "HmacSHA256"));
+            m = borrow();
             m.update(type.getBytes(StandardCharsets.US_ASCII));
             m.update((byte) '.');
-            return ENC.encodeToString(m.doFinal(data.getBytes(StandardCharsets.US_ASCII)));
+            return ENC.encodeToString(m.doFinal(data.getBytes(StandardCharsets.US_ASCII))); // doFinal resets the Mac
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        } finally {
+            if (m != null) pool.offer(m);
         }
+    }
+
+    private static String encode(Ticket t) {
+        String raw = String.join("|", clean(t.reqId), clean(t.slot), clean(t.campaign), clean(t.advertiser),
+                Long.toString(t.priceCpmMicros), clean(t.arm), clean(t.user), clean(t.pub), clean(t.cat), clean(t.dev),
+                clean(t.geo), Integer.toString(t.hour), clean(t.segs), Double.toString(t.pctr), Long.toString(t.expMs));
+        return ENC.encodeToString(raw.getBytes(StandardCharsets.UTF_8));
     }
 
     /** @return query string "d=...&s=..." */
     public String sign(String type, Ticket t) {
-        String raw = String.join("|", clean(t.reqId), clean(t.slot), clean(t.campaign), clean(t.advertiser),
-                Long.toString(t.priceCpmMicros), clean(t.arm), clean(t.user), clean(t.pub), clean(t.cat), clean(t.dev),
-                clean(t.geo), Integer.toString(t.hour), clean(t.segs), Double.toString(t.pctr), Long.toString(t.expMs));
-        String d = ENC.encodeToString(raw.getBytes(StandardCharsets.UTF_8));
+        String d = encode(t);
         return "d=" + d + "&s=" + mac(type, d);
+    }
+
+    /** win, imp and click query strings for one ticket; the payload is encoded once and only the MAC differs. */
+    public String[] signAll(Ticket t) {
+        String d = encode(t);
+        return new String[]{"d=" + d + "&s=" + mac("win", d), "d=" + d + "&s=" + mac("imp", d), "d=" + d + "&s=" + mac("click", d)};
     }
 
     public Verified verify(String type, String d, String s, long nowMs) {

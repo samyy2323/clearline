@@ -77,9 +77,9 @@ public class BidGateway {
             for (BidResponse.Bid b : r.bids()) {
                 var t = new TrackingSigner.Ticket(req.id(), b.slotId(), b.campaignId(), b.advertiserId(), b.priceCpmMicros(),
                         r.pricingArm(), req.userId(), req.publisherId(), req.siteCategory(), req.device(), req.geo(), hour, segs, b.pctr(), exp);
-                var s = tracker.signer();
+                String[] q = tracker.signer().signAll(t);
                 offers.add(new Offer(b.slotId(), b.campaignId(), b.advertiserId(), b.priceCpmMicros(), b.pctr(),
-                        "/track/win?" + s.sign("win", t), "/track/imp?" + s.sign("imp", t), "/track/click?" + s.sign("click", t)));
+                        "/track/win?" + q[0], "/track/imp?" + q[1], "/track/click?" + q[2]));
                 var c = stats.of(b.campaignId());
                 c.awards.increment();
                 c.awardedMicros.add(Math.max(1, b.priceCpmMicros() / 1000));

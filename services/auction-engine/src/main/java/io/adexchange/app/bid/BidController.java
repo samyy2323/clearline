@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.util.JsonRecyclerPools;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,6 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /** OpenRTB-lite ingress. 204 = no-bid (reason in header); 400 = malformed; 429 = per-IP rate limit. */
 @RestController
 class BidController {
+    // parsed by hand: skips Spring's per-request generic-type resolution (reflection + Type[] garbage seen in the profile)
+    private static final ObjectMapper MAPPER = new ObjectMapper(JsonFactory.builder().recyclerPool(JsonRecyclerPools.sharedLockFreePool()).build())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     private final BidGateway gateway;
     private final int ipLimitPerSec;
     private final Map<String, AtomicInteger> ipCounts = new ConcurrentHashMap<>();
@@ -58,8 +67,15 @@ class BidController {
     }
 
     @PostMapping("/openrtb/bid")
-    ResponseEntity<?> bid(@RequestBody BidRequest req, HttpServletRequest http) {
+    ResponseEntity<?> bid(@RequestBody byte[] raw, HttpServletRequest http) {
         if (limited(http)) return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
+        BidRequest req;
+        try {
+            req = MAPPER.readValue(raw, BidRequest.class);
+        } catch (IOException e) {
+            gateway.invalid.increment();
+            return ResponseEntity.badRequest().body(Map.of("error", "invalid request: malformed json"));
+        }
         String bad = validate(req);
         if (bad != null) {
             gateway.invalid.increment();
